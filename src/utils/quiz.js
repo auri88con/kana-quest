@@ -7,12 +7,12 @@ export function shuffle(array) {
   return copy
 }
 
-export function pickRandom(array, excludeItem) {
+export function pickRandom(array, excludeItem, keyFn = (item) => item.char) {
   if (array.length === 0) return null
   if (array.length === 1) return array[0]
   let choice = array[Math.floor(Math.random() * array.length)]
   let guard = 0
-  while (excludeItem && choice.char === excludeItem.char && guard < 50) {
+  while (excludeItem && keyFn(choice) === keyFn(excludeItem) && guard < 50) {
     choice = array[Math.floor(Math.random() * array.length)]
     guard += 1
   }

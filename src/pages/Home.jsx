@@ -15,9 +15,18 @@ export default function Home({ onOpenSection }) {
 
   const totalSeen = sections.reduce((sum, [key]) => sum + (progress[key]?.seenCharacters.length ?? 0), 0)
   const totalChars = sections.reduce((sum, [, meta]) => sum + meta.total, 0)
-  const totalAttempts = sections.reduce((sum, [key]) => sum + (progress[key]?.quiz.attempts ?? 0), 0)
-  const totalCorrect = sections.reduce((sum, [key]) => sum + (progress[key]?.quiz.correct ?? 0), 0)
-  const bestStreak = sections.reduce((max, [key]) => Math.max(max, progress[key]?.quiz.bestStreak ?? 0), 0)
+  const totalAttempts = sections.reduce(
+    (sum, [key]) => sum + (progress[key]?.quiz.attempts ?? 0) + (progress[key]?.readingGame.attempts ?? 0),
+    0,
+  )
+  const totalCorrect = sections.reduce(
+    (sum, [key]) => sum + (progress[key]?.quiz.correct ?? 0) + (progress[key]?.readingGame.correct ?? 0),
+    0,
+  )
+  const bestStreak = sections.reduce(
+    (max, [key]) => Math.max(max, progress[key]?.quiz.bestStreak ?? 0, progress[key]?.readingGame.bestStreak ?? 0),
+    0,
+  )
   const accuracy = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : null
 
   return (

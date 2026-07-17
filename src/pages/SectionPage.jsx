@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import CharacterBrowser from '../components/CharacterBrowser'
 import FlashcardQuiz from '../components/FlashcardQuiz'
+import ReadingGame from '../components/ReadingGame'
+import { readingGameWords } from '../data/readingGame'
 import {
   hiraganaAllCharacters,
   hiraganaMainRows,
@@ -82,8 +84,12 @@ export default function SectionPage({ section, onBack }) {
         >
           🎯 Flashcard Quiz
         </button>
-        <button type="button" className="pill-tab is-disabled" disabled title="Coming in a future stage">
-          📝 Reading Game (soon)
+        <button
+          type="button"
+          className={`pill-tab ${mode === 'reading' ? 'is-active' : ''}`}
+          onClick={() => setMode('reading')}
+        >
+          📝 Reading Game
         </button>
       </div>
 
@@ -98,6 +104,8 @@ export default function SectionPage({ section, onBack }) {
       )}
 
       {mode === 'quiz' && <FlashcardQuiz section={section} characters={config.characters} />}
+
+      {mode === 'reading' && <ReadingGame section={section} wordsByLevel={readingGameWords[section]} />}
     </div>
   )
 }
