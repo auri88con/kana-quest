@@ -1,0 +1,106 @@
+.kana-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  min-width: 0;
+  background: var(--color-white);
+  border: 3px solid var(--color-sakura-light);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 0.6rem 0.75rem;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  text-align: center;
+}
+
+.kana-card:hover {
+  transform: translateY(-4px) rotate(-0.5deg);
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--color-sakura);
+}
+
+.kana-card:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+.kana-card.is-seen {
+  border-color: var(--color-green);
+  background: linear-gradient(180deg, #ffffff 0%, #f2fbf6 100%);
+}
+
+.kana-card-check {
+  position: absolute;
+  top: -10px;
+  right: -8px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-green);
+  color: var(--color-white);
+  border-radius: 50%;
+  font-size: 0.85rem;
+  border: 2px solid var(--color-white);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.kana-card-char {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2.6rem;
+  line-height: 1;
+  color: var(--color-indigo-deep);
+}
+
+.kana-card-romaji {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-sakura-deep);
+  text-transform: lowercase;
+}
+
+.kana-card-illustration {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-cream-deep);
+  border-radius: 50%;
+  margin: 0.15rem 0;
+  border: 2px dashed var(--color-sakura-light);
+}
+
+.kana-card-emoji {
+  font-size: 1.6rem;
+}
+
+.kana-card-word {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  line-height: 1.2;
+}
+
+.kana-card-word-kana {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-ink);
+}
+
+.kana-card-word-romaji {
+  font-size: 0.75rem;
+  color: var(--color-indigo);
+  font-weight: 600;
+}
+
+.kana-card-word-meaning {
+  font-size: 0.75rem;
+  color: #8b8397;
+  font-style: italic;
+}
