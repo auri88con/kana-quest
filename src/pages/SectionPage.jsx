@@ -8,6 +8,13 @@ import {
   hiraganaHandakuon,
   hiraganaYoon,
 } from '../data/hiragana'
+import {
+  katakanaAllCharacters,
+  katakanaMainRows,
+  katakanaVoiced,
+  katakanaHandakuon,
+  katakanaYoon,
+} from '../data/katakana'
 import './SectionPage.css'
 
 const SECTION_CONFIG = {
@@ -20,7 +27,15 @@ const SECTION_CONFIG = {
     handakuonGroups: hiraganaHandakuon,
     yoonGroups: hiraganaYoon,
   },
-  katakana: { label: 'Katakana', ready: false },
+  katakana: {
+    label: 'Katakana',
+    ready: true,
+    characters: katakanaAllCharacters,
+    rowGroups: katakanaMainRows,
+    dakuonGroups: katakanaVoiced,
+    handakuonGroups: katakanaHandakuon,
+    yoonGroups: katakanaYoon,
+  },
   kanji: { label: 'Kanji', ready: false },
 }
 
