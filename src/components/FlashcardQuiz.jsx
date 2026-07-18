@@ -1,13 +1,31 @@
 import { useState } from 'react'
 import { useProgressContext } from '../context/ProgressContext'
 import { buildMultipleChoiceOptions, pickRandom } from '../utils/quiz'
+import { isRomajiMatch } from '../utils/romaji'
 import './FlashcardQuiz.css'
 
-export default function FlashcardQuiz({ section, characters }) {
+const DEFAULT_ANSWER_MODES = [{ key: 'romaji', label: 'Romaji', prompt: 'What sound is this?' }]
+
+// For kanji, `meaning` can hold alternates like "before / front" — only the
+// first is used as the quiz answer, keeping options/feedback single words.
+function answerValue(item, targetKey) {
+  const raw = item[targetKey]
+  return targetKey === 'meaning' ? raw.split('/')[0].trim() : raw
+}
+
+function isAnswerMatch(input, targetKey, correctValue) {
+  if (targetKey === 'romaji') return isRomajiMatch(input, correctValue)
+  return input.trim().toLowerCase() === correctValue.trim().toLowerCase()
+}
+
+export default function FlashcardQuiz({ section, characters, answerModes = DEFAULT_ANSWER_MODES }) {
   const { recordQuizAnswer } = useProgressContext()
   const [answerMode, setAnswerMode] = useState('choice') // 'choice' | 'type'
+  const [target, setTarget] = useState(answerModes[0].key)
   const [current, setCurrent] = useState(() => pickRandom(characters))
-  const [options, setOptions] = useState(() => buildMultipleChoiceOptions(characters, current))
+  const [options, setOptions] = useState(() =>
+    buildMultipleChoiceOptions(characters, current, 4, (item) => answerValue(item, target)),
+  )
   const [typedAnswer, setTypedAnswer] = useState('')
   const [feedback, setFeedback] = useState(null) // null | 'correct' | 'wrong'
   const [selected, setSelected] = useState(null)
@@ -16,13 +34,25 @@ export default function FlashcardQuiz({ section, characters }) {
   const [bestStreak, setBestStreak] = useState(0)
   const [answered, setAnswered] = useState(0)
 
-  function nextQuestion() {
-    const next = pickRandom(characters, current)
+  const correctValue = answerValue(current, target)
+  const promptLabel = answerModes.find((m) => m.key === target)?.prompt ?? DEFAULT_ANSWER_MODES[0].prompt
+
+  function refreshQuestion(next, nextTarget = target) {
     setCurrent(next)
-    setOptions(buildMultipleChoiceOptions(characters, next))
+    setOptions(buildMultipleChoiceOptions(characters, next, 4, (item) => answerValue(item, nextTarget)))
     setTypedAnswer('')
     setFeedback(null)
     setSelected(null)
+  }
+
+  function nextQuestion() {
+    refreshQuestion(pickRandom(characters, current))
+  }
+
+  function selectTarget(key) {
+    if (key === target) return
+    setTarget(key)
+    refreshQuestion(pickRandom(characters, current), key)
   }
 
   function handleAnswer(isCorrect, chosenValue) {
@@ -38,14 +68,14 @@ export default function FlashcardQuiz({ section, characters }) {
 
   function handleChoiceClick(option) {
     if (feedback) return
-    handleAnswer(option === current.romaji, option)
+    handleAnswer(option === correctValue, option)
   }
 
   function handleTypeSubmit(e) {
     e.preventDefault()
     if (feedback || !typedAnswer.trim()) return
-    const normalized = typedAnswer.trim().toLowerCase()
-    handleAnswer(normalized === current.romaji, normalized)
+    const isCorrect = isAnswerMatch(typedAnswer, target, correctValue)
+    handleAnswer(isCorrect, typedAnswer.trim().toLowerCase())
   }
 
   if (!current) return null
@@ -73,18 +103,32 @@ export default function FlashcardQuiz({ section, characters }) {
         </div>
       </div>
 
+      {answerModes.length > 1 && (
+        <div className="pill-tabs target-tabs">
+          {answerModes.map((mode) => (
+            <button
+              key={mode.key}
+              className={`pill-tab ${target === mode.key ? 'is-active' : ''}`}
+              onClick={() => selectTarget(mode.key)}
+            >
+              {mode.label}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div
         className={`quiz-card card-surface ${feedback === 'correct' ? 'anim-correct' : ''} ${
           feedback === 'wrong' ? 'anim-wiggle' : ''
         }`}
       >
-        <span className="quiz-prompt-label">What sound is this?</span>
+        <span className="quiz-prompt-label">{promptLabel}</span>
         <span className="quiz-char">{current.char}</span>
 
         {answerMode === 'choice' ? (
           <div className="quiz-options">
             {options.map((option) => {
-              const isCorrectOption = option === current.romaji
+              const isCorrectOption = option === correctValue
               const shouldHighlight = feedback && (option === selected || (feedback === 'wrong' && isCorrectOption))
               let stateClass = ''
               if (shouldHighlight) stateClass = isCorrectOption ? 'is-correct' : 'is-wrong'
@@ -109,7 +153,7 @@ export default function FlashcardQuiz({ section, characters }) {
               value={typedAnswer}
               onChange={(e) => setTypedAnswer(e.target.value)}
               disabled={!!feedback}
-              placeholder="type the romaji…"
+              placeholder={target === 'meaning' ? 'type the meaning…' : 'type the romaji…'}
               autoComplete="off"
               autoCapitalize="off"
               spellCheck={false}
@@ -126,7 +170,7 @@ export default function FlashcardQuiz({ section, characters }) {
         {feedback && (
           <div className={`quiz-feedback ${feedback}`}>
             <p className="quiz-feedback-headline">
-              {feedback === 'correct' ? 'Nice! 🎉' : `Not quite — it's "${current.romaji}"`}
+              {feedback === 'correct' ? 'Nice! 🎉' : `Not quite — it's "${correctValue}"`}
             </p>
             <p className="quiz-feedback-word">
               {current.word.kana} <span className="quiz-feedback-romaji">({current.word.romaji})</span> —{' '}

@@ -20,6 +20,10 @@
   gap: 0.6rem;
 }
 
+.target-tabs {
+  justify-content: center;
+}
+
 .quiz-stat {
   font-family: var(--font-display);
   font-weight: 700;

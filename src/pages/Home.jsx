@@ -1,12 +1,13 @@
 import { hiraganaAllCharacters } from '../data/hiragana'
 import { katakanaAllCharacters } from '../data/katakana'
+import { kanjiAllCharacters } from '../data/kanji'
 import { useProgressContext } from '../context/ProgressContext'
 import './Home.css'
 
 const SECTION_META = {
   hiragana: { label: 'Hiragana', emoji: 'あ', total: hiraganaAllCharacters.length, ready: true, tagline: 'The everyday syllabary' },
   katakana: { label: 'Katakana', emoji: 'ア', total: katakanaAllCharacters.length, ready: true, tagline: 'For loanwords & names' },
-  kanji: { label: 'Kanji', emoji: '漢', total: 0, ready: false, tagline: 'Meaning-packed characters' },
+  kanji: { label: 'Kanji', emoji: '漢', total: kanjiAllCharacters.length, ready: true, tagline: 'Meaning-packed characters' },
 }
 
 export default function Home({ onOpenSection }) {

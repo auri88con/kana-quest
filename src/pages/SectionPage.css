@@ -28,6 +28,10 @@
   justify-content: center;
 }
 
+.tier-tabs {
+  justify-content: center;
+}
+
 .pill-tab.is-disabled {
   opacity: 0.5;
   cursor: not-allowed;

@@ -1,0 +1,7 @@
+.kanji-card-meaning {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--color-indigo);
+  text-transform: capitalize;
+}

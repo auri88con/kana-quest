@@ -19,19 +19,29 @@ export function pickRandom(array, excludeItem, keyFn = (item) => item.char) {
   return choice
 }
 
-// Builds shuffled multiple-choice romaji options, guaranteeing no duplicate
-// romaji among the options (some kana share a romanization, e.g. じ/ぢ = "ji").
-export function buildMultipleChoiceOptions(characters, correct, count = 4) {
-  const usedRomaji = new Set([correct.romaji])
-  const pool = shuffle(characters.filter((c) => c.char !== correct.char))
+// Builds shuffled multiple-choice answer options, guaranteeing no duplicate
+// answer values among the options (some kana share a romanization, e.g.
+// じ/ぢ = "ji"). `keyFn` extracts the answer value to show/compare (defaults
+// to romaji); `excludeKeyFn` identifies "the same item" to exclude from the
+// distractor pool (defaults to the character itself).
+export function buildMultipleChoiceOptions(
+  characters,
+  correct,
+  count = 4,
+  keyFn = (item) => item.romaji,
+  excludeKeyFn = (item) => item.char,
+) {
+  const usedKeys = new Set([keyFn(correct)])
+  const pool = shuffle(characters.filter((c) => excludeKeyFn(c) !== excludeKeyFn(correct)))
   const distractors = []
 
   for (const candidate of pool) {
     if (distractors.length >= count - 1) break
-    if (usedRomaji.has(candidate.romaji)) continue
-    usedRomaji.add(candidate.romaji)
-    distractors.push(candidate.romaji)
+    const key = keyFn(candidate)
+    if (usedKeys.has(key)) continue
+    usedKeys.add(key)
+    distractors.push(key)
   }
 
-  return shuffle([correct.romaji, ...distractors])
+  return shuffle([keyFn(correct), ...distractors])
 }
