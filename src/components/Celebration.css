@@ -1,0 +1,11 @@
+.celebration {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--color-white);
+  background: linear-gradient(135deg, var(--color-sakura), var(--color-indigo));
+  padding: 0.65rem 1.4rem;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-pop);
+  text-align: center;
+}

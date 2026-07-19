@@ -55,3 +55,9 @@
 .coming-soon p {
   color: #8b8397;
 }
+
+@media (max-width: 480px) {
+  .section-page {
+    gap: 0.85rem;
+  }
+}

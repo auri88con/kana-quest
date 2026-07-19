@@ -140,6 +140,30 @@
   color: var(--color-indigo);
 }
 
+.section-card-stats {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.mini-stat {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.75rem;
+  background: var(--color-cream-deep);
+  color: var(--color-indigo-deep);
+  padding: 0.3rem 0.55rem;
+  border-radius: var(--radius-pill);
+}
+
+.mini-stat.is-flaming,
+.stat-value.is-flaming {
+  animation: flame-flicker 0.9s ease infinite;
+}
+
 .badge-soon {
   margin-top: 0.4rem;
   font-size: 0.75rem;

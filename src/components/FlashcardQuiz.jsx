@@ -1,8 +1,14 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useProgressContext } from '../context/ProgressContext'
 import { buildMultipleChoiceOptions, pickRandom } from '../utils/quiz'
 import { isRomajiMatch } from '../utils/romaji'
+import { randomCorrectMessage, randomWrongMessage } from '../utils/messages'
+import StreakStat from './StreakStat'
+import Celebration from './Celebration'
 import './FlashcardQuiz.css'
+
+const STREAK_MILESTONE = 5
+const CELEBRATION_DURATION_MS = 2600
 
 const DEFAULT_ANSWER_MODES = [{ key: 'romaji', label: 'Romaji', prompt: 'What sound is this?' }]
 
@@ -28,11 +34,20 @@ export default function FlashcardQuiz({ section, characters, answerModes = DEFAU
   )
   const [typedAnswer, setTypedAnswer] = useState('')
   const [feedback, setFeedback] = useState(null) // null | 'correct' | 'wrong'
+  const [feedbackMessage, setFeedbackMessage] = useState('')
   const [selected, setSelected] = useState(null)
   const [score, setScore] = useState(0)
   const [streak, setStreak] = useState(0)
   const [bestStreak, setBestStreak] = useState(0)
   const [answered, setAnswered] = useState(0)
+  const [celebration, setCelebration] = useState(null)
+  const celebrationTimeout = useRef(null)
+
+  function triggerCelebration(message) {
+    setCelebration(message)
+    clearTimeout(celebrationTimeout.current)
+    celebrationTimeout.current = setTimeout(() => setCelebration(null), CELEBRATION_DURATION_MS)
+  }
 
   const correctValue = answerValue(current, target)
   const promptLabel = answerModes.find((m) => m.key === target)?.prompt ?? DEFAULT_ANSWER_MODES[0].prompt
@@ -58,12 +73,16 @@ export default function FlashcardQuiz({ section, characters, answerModes = DEFAU
   function handleAnswer(isCorrect, chosenValue) {
     setSelected(chosenValue)
     setFeedback(isCorrect ? 'correct' : 'wrong')
+    setFeedbackMessage(isCorrect ? randomCorrectMessage() : randomWrongMessage(correctValue))
     setAnswered((n) => n + 1)
     const newStreak = isCorrect ? streak + 1 : 0
     setStreak(newStreak)
     setBestStreak((b) => Math.max(b, newStreak))
     if (isCorrect) setScore((s) => s + 1)
     recordQuizAnswer(section, isCorrect, newStreak)
+    if (isCorrect && newStreak > 0 && newStreak % STREAK_MILESTONE === 0) {
+      triggerCelebration(`🔥 ${newStreak} in a row!`)
+    }
   }
 
   function handleChoiceClick(option) {
@@ -99,9 +118,11 @@ export default function FlashcardQuiz({ section, characters, answerModes = DEFAU
         </div>
         <div className="quiz-stats">
           <span className="quiz-stat">⭐ {score}</span>
-          <span className="quiz-stat">🔥 {streak}</span>
+          <StreakStat streak={streak} />
         </div>
       </div>
+
+      <Celebration message={celebration} />
 
       {answerModes.length > 1 && (
         <div className="pill-tabs target-tabs">
@@ -169,9 +190,7 @@ export default function FlashcardQuiz({ section, characters, answerModes = DEFAU
 
         {feedback && (
           <div className={`quiz-feedback ${feedback}`}>
-            <p className="quiz-feedback-headline">
-              {feedback === 'correct' ? 'Nice! 🎉' : `Not quite — it's "${correctValue}"`}
-            </p>
+            <p className="quiz-feedback-headline">{feedbackMessage}</p>
             <p className="quiz-feedback-word">
               {current.word.kana} <span className="quiz-feedback-romaji">({current.word.romaji})</span> —{' '}
               {current.word.meaning}

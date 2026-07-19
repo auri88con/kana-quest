@@ -172,6 +172,13 @@ ul {
   color: var(--color-white);
 }
 
+@media (max-width: 480px) {
+  .pill-tab {
+    font-size: 0.85rem;
+    padding: 0.45rem 0.85rem;
+  }
+}
+
 /* ---------- Animations ---------- */
 
 @keyframes pop-in {

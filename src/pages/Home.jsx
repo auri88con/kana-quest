@@ -52,7 +52,7 @@ export default function Home({ onOpenSection }) {
             <span className="stat-label">quiz accuracy</span>
           </div>
           <div className="stat">
-            <span className="stat-value">🔥 {bestStreak}</span>
+            <span className={`stat-value ${bestStreak > 0 ? 'is-flaming' : ''}`}>🔥 {bestStreak}</span>
             <span className="stat-label">best streak</span>
           </div>
         </div>
@@ -62,18 +62,38 @@ export default function Home({ onOpenSection }) {
         {sections.map(([key, meta]) => {
           const seen = progress[key]?.seenCharacters.length ?? 0
           const pct = meta.total > 0 ? Math.round((seen / meta.total) * 100) : 0
+          const quiz = progress[key]?.quiz
+          const reading = progress[key]?.readingGame
+          const sectionAttempts = (quiz?.attempts ?? 0) + (reading?.attempts ?? 0)
+          const sectionCorrect = (quiz?.correct ?? 0) + (reading?.correct ?? 0)
+          const sectionAccuracy = sectionAttempts > 0 ? Math.round((sectionCorrect / sectionAttempts) * 100) : null
+          const sectionBestStreak = Math.max(quiz?.bestStreak ?? 0, reading?.bestStreak ?? 0)
+          const sectionReadingLevel = reading?.unlockedLevel ?? 1
           return (
             <button key={key} type="button" className="section-card card-surface" onClick={() => onOpenSection(key)}>
               <span className="section-card-emoji" aria-hidden="true">{meta.emoji}</span>
               <h3>{meta.label}</h3>
               <p className="section-card-tagline">{meta.tagline}</p>
               {meta.ready ? (
-                <div className="section-card-progress">
-                  <div className="progress-bar">
-                    <div className="progress-bar-fill" style={{ width: `${pct}%` }} />
+                <>
+                  <div className="section-card-progress">
+                    <div className="progress-bar">
+                      <div className="progress-bar-fill" style={{ width: `${pct}%` }} />
+                    </div>
+                    <span className="section-card-progress-label">{seen}/{meta.total}</span>
                   </div>
-                  <span className="section-card-progress-label">{seen}/{meta.total}</span>
-                </div>
+                  <div className="section-card-stats">
+                    <span className="mini-stat" title="Quiz + reading game accuracy">
+                      🎯 {sectionAccuracy === null ? '—' : `${sectionAccuracy}%`}
+                    </span>
+                    <span className={`mini-stat ${sectionBestStreak > 0 ? 'is-flaming' : ''}`} title="Best streak">
+                      🔥 {sectionBestStreak}
+                    </span>
+                    <span className="mini-stat" title="Reading game level unlocked">
+                      📝 Lv{sectionReadingLevel}/5
+                    </span>
+                  </div>
+                </>
               ) : (
                 <span className="badge-soon">Coming soon</span>
               )}
