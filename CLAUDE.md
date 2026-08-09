@@ -22,7 +22,7 @@ npm run preview   # serve the production build locally
 npm run lint       # oxlint
 ```
 
-Deploys to Vercel via `vercel --prod` (project `kana-quest` under the `aurora-labs88` scope). Not currently wired to auto-deploy on push — redeploy manually after merging changes you want live.
+Deploys to Vercel (project `kana-quest` under the `aurora-labs88` scope). The GitHub repo is connected to Vercel, so pushes to `master` auto-deploy to production — manual `vercel --prod` is only needed for local-only changes not yet pushed.
 
 ## App structure
 

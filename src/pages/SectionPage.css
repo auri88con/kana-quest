@@ -32,6 +32,11 @@
   justify-content: center;
 }
 
+.style-tabs,
+.script-tabs {
+  justify-content: center;
+}
+
 .pill-tab.is-disabled {
   opacity: 0.5;
   cursor: not-allowed;

@@ -1,0 +1,72 @@
+.verb-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 720px) {
+  .verb-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.verb-card {
+  align-items: stretch;
+}
+
+.verb-card-hero {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  cursor: pointer;
+  position: relative;
+}
+
+.verb-card-furigana {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-indigo);
+}
+
+.verb-conjugation-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.6rem;
+  text-align: left;
+}
+
+.verb-conjugation-table th {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.72rem;
+  color: var(--color-sakura-deep);
+  padding: 0.3rem 0.5rem 0.3rem 0;
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+.verb-conjugation-table td {
+  padding: 0.3rem 0;
+  vertical-align: top;
+}
+
+.verb-form-kanji {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-ink);
+  margin-right: 0.35rem;
+}
+
+.verb-form-kana {
+  color: var(--color-indigo-deep);
+  font-size: 0.8rem;
+  margin-right: 0.35rem;
+}
+
+.verb-form-romaji {
+  color: #8b8397;
+  font-size: 0.75rem;
+  font-style: italic;
+}

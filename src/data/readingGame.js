@@ -181,4 +181,62 @@ export const readingGameWords = {
       { kana: '友達と学校に行きます', romaji: 'tomodachitogakkouniikimasu', meaning: 'I go to school with my friends.' },
     ],
   },
+  // Verb levels track phrase length rather than pure character count: L1 is
+  // bare dictionary-form verbs, L2-3 add a short object/particle, L4 extends
+  // the phrase, L5 is a full polite (ます-form) sentence. Unlike the other
+  // sections' smashed-together level-5 romaji, verb-phrase romaji keeps
+  // spaces between words (matching how a learner would actually romanize
+  // a sentence, and how it's used in the wild for verb phrases).
+  verbs: {
+    1: [
+      { kana: '見る', romaji: 'miru', meaning: 'to see / watch' },
+      { kana: '寝る', romaji: 'neru', meaning: 'to sleep' },
+      { kana: '出る', romaji: 'deru', meaning: 'to exit / leave' },
+      { kana: '来る', romaji: 'kuru', meaning: 'to come' },
+      { kana: '切る', romaji: 'kiru', meaning: 'to cut' },
+      { kana: '知る', romaji: 'shiru', meaning: 'to know' },
+      { kana: '待つ', romaji: 'matsu', meaning: 'to wait' },
+      { kana: '立つ', romaji: 'tatsu', meaning: 'to stand' },
+    ],
+    2: [
+      { kana: '花を買う', romaji: 'hana wo kau', meaning: 'to buy flowers' },
+      { kana: '水を飲む', romaji: 'mizu wo nomu', meaning: 'to drink water' },
+      { kana: '本を読む', romaji: 'hon wo yomu', meaning: 'to read a book' },
+      { kana: '手紙を書く', romaji: 'tegami wo kaku', meaning: 'to write a letter' },
+      { kana: '服を洗う', romaji: 'fuku wo arau', meaning: 'to wash clothes' },
+      { kana: '写真を撮る', romaji: 'shashin wo toru', meaning: 'to take a photo' },
+      { kana: '靴を脱ぐ', romaji: 'kutsu wo nugu', meaning: "to take off one's shoes" },
+      { kana: 'コートを着る', romaji: 'kooto wo kiru', meaning: 'to wear a coat' },
+    ],
+    3: [
+      { kana: 'コーヒーを飲む', romaji: 'koohii wo nomu', meaning: 'to drink coffee' },
+      { kana: '音楽を聞く', romaji: 'ongaku wo kiku', meaning: 'to listen to music' },
+      { kana: '友達に会う', romaji: 'tomodachi ni au', meaning: 'to meet a friend' },
+      { kana: '電車に乗る', romaji: 'densha ni noru', meaning: 'to get on the train' },
+      { kana: '日本語を話す', romaji: 'nihongo wo hanasu', meaning: 'to speak Japanese' },
+      { kana: '公園で遊ぶ', romaji: 'kouen de asobu', meaning: 'to play at the park' },
+      { kana: '部屋を掃除する', romaji: 'heya wo souji suru', meaning: 'to clean the room' },
+      { kana: '山に登る', romaji: 'yama ni noboru', meaning: 'to climb a mountain' },
+    ],
+    4: [
+      { kana: '日本語を勉強する', romaji: 'nihongo wo benkyou suru', meaning: 'to study Japanese' },
+      { kana: '早く家に帰る', romaji: 'hayaku ie ni kaeru', meaning: 'to return home early' },
+      { kana: '友達に電話する', romaji: 'tomodachi ni denwa suru', meaning: 'to call a friend' },
+      { kana: '図書館で本を読む', romaji: 'toshokan de hon wo yomu', meaning: 'to read a book at the library' },
+      { kana: 'レストランを予約する', romaji: 'resutoran wo yoyaku suru', meaning: 'to reserve a restaurant' },
+      { kana: '財布を見つける', romaji: 'saifu wo mitsukeru', meaning: 'to find a wallet' },
+      { kana: '病気を治す', romaji: 'byouki wo naosu', meaning: 'to cure an illness' },
+      { kana: '大学を卒業する', romaji: 'daigaku wo sotsugyou suru', meaning: 'to graduate from university' },
+    ],
+    5: [
+      { kana: '毎朝コーヒーを飲みます', romaji: 'maiasa koohii wo nomimasu', meaning: 'I drink coffee every morning.' },
+      { kana: '週末に友達と遊びます', romaji: 'shuumatsu ni tomodachi to asobimasu', meaning: 'I play with friends on weekends.' },
+      { kana: '明日学校に行きます', romaji: 'ashita gakkou ni ikimasu', meaning: 'I will go to school tomorrow.' },
+      { kana: '毎日日本語を勉強します', romaji: 'mainichi nihongo wo benkyou shimasu', meaning: 'I study Japanese every day.' },
+      { kana: '昨日新しい靴を買いました', romaji: 'kinou atarashii kutsu wo kaimashita', meaning: 'I bought new shoes yesterday.' },
+      { kana: '今晩友達に電話します', romaji: 'konban tomodachi ni denwa shimasu', meaning: 'I will call a friend tonight.' },
+      { kana: '来年大学を卒業します', romaji: 'rainen daigaku wo sotsugyou shimasu', meaning: 'I will graduate from university next year.' },
+      { kana: '毎週日曜日に部屋を掃除します', romaji: 'maishuu nichiyoubi ni heya wo souji shimasu', meaning: 'I clean my room every Sunday.' },
+    ],
+  },
 }

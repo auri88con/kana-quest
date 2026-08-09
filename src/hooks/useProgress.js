@@ -71,9 +71,56 @@ export function useProgress() {
     })
   }, [])
 
+  // Conjugation practice only exists for the verbs section, so (unlike the
+  // generic actions above) this is deliberately hardcoded to `verbs` rather
+  // than taking a `section` param — keeps the special-casing contained here
+  // instead of sprinkling `if (section === 'verbs')` through shared code.
+  const recordConjugationAnswer = useCallback((style, verbChar, isCorrect, streakAfter) => {
+    setProgress((prev) => {
+      const sectionData = prev.verbs ?? defaultProgress().verbs
+      const styleProgress = sectionData.conjugation[style]
+      const prior = styleProgress.verbMastery[verbChar] ?? {
+        attempts: 0,
+        correct: 0,
+        lastCorrect: false,
+        lastPracticedAt: 0,
+      }
+      return {
+        ...prev,
+        verbs: {
+          ...sectionData,
+          conjugation: {
+            ...sectionData.conjugation,
+            [style]: {
+              attempts: styleProgress.attempts + 1,
+              correct: styleProgress.correct + (isCorrect ? 1 : 0),
+              bestStreak: Math.max(styleProgress.bestStreak, streakAfter),
+              verbMastery: {
+                ...styleProgress.verbMastery,
+                [verbChar]: {
+                  attempts: prior.attempts + 1,
+                  correct: prior.correct + (isCorrect ? 1 : 0),
+                  lastCorrect: isCorrect,
+                  lastPracticedAt: Date.now(),
+                },
+              },
+            },
+          },
+        },
+      }
+    })
+  }, [])
+
   const resetProgress = useCallback(() => {
     setProgress(defaultProgress())
   }, [])
 
-  return { progress, markCharacterSeen, recordQuizAnswer, recordReadingAnswer, resetProgress }
+  return {
+    progress,
+    markCharacterSeen,
+    recordQuizAnswer,
+    recordReadingAnswer,
+    recordConjugationAnswer,
+    resetProgress,
+  }
 }
