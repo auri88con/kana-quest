@@ -2,7 +2,7 @@
 
 Stages 1–5 are already built and live. Paste each stage below into Claude Code one at a time, in order. Wait for a stage to be complete, tested, committed, and pushed before pasting the next.
 
-Reminder for every stage: commit and push to the **kana-quest** repo with a clear message when done (Vercel auto-deploys), and update CLAUDE.md whenever a stage adds a new system.
+Reminder for every stage: commit and push to the **kana-quest** repo with a clear message when done (Vercel auto-deploys), and update **KANA_HANDBOOK.md** whenever a stage adds a new system. The handbook is the single source of truth for project state; CLAUDE.md just points to it.
 
 ---
 
@@ -119,7 +119,7 @@ Make Kana Quest feel like an installed native app, not a website.
 - All persisted in localStorage
 
 **Project handbook:**
-- Create **KANA_HANDBOOK.md** in the repo root: current feature list, architecture overview, data file structure, design language, stage history, and conventions — a living document kept up to date at the end of every future stage so any new session can onboard without chat history
+- ✅ **Already done — do not repeat.** `KANA_HANDBOOK.md` exists in the repo root and already covers the feature list, architecture overview, data file structure, design language, stage history and conventions. Keep it updated at the end of every stage rather than recreating it.
 
 ---
 
@@ -203,7 +203,7 @@ Add the daily habit layer:
 - Small celebratory animations when earning badges or extending streaks
 - A stats page: total characters mastered per script, accuracy over time, longest streak
 
-Then update CLAUDE.md to document all new systems.
+Then update KANA_HANDBOOK.md to document all new systems.
 
 ---
 
@@ -228,7 +228,7 @@ The app now has three official mascots. Their images are in `public/mascots/`: `
 5. **Home screen presence:** one random mascot hangs out on the home screen each visit, with a subtle idle animation (breathing, occasional blink or bounce) and a tap/click reaction (a little hop plus a personality line).
 6. Keep it charming, not intrusive: reactions play for a couple of seconds and never block the user from moving on (tap to skip).
 
-Then update CLAUDE.md with the mascot system documentation.
+Then update KANA_HANDBOOK.md with the mascot system documentation.
 
 ---
 
@@ -264,7 +264,7 @@ Finish the account experience:
 - Per-account settings sync (font choice, quiz preferences, etc.)
 - Security pass: Firestore security rules so users can only ever read/write their own data — test this
 - Full test pass: signup → play → log out → second account → separate progress → log back in → everything intact
-- Update CLAUDE.md with the full auth + sync architecture
+- Update KANA_HANDBOOK.md with the full auth + sync architecture
 
 ---
 
