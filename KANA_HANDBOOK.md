@@ -92,7 +92,7 @@ They react after quizzes, celebrate streaks and milestones, and idle on the home
 | 19 | Marquee & showcase | ⬜ |
 | 20 | Journey mode (guided lesson path) | ⬜ |
 
-*(Full stage briefs for Stage 6.5 onward are not yet written down — capture them in `kana-quest-stages-6-plus.md` when they are.)*
+*(Full per-stage briefs — scope, requirements and content lists for Stage 6 through Stage 19 — live in [`kana-quest-stages-6-plus.md`](kana-quest-stages-6-plus.md) in the repo root. That doc is the source of truth for what each stage must deliver; this table is just the index. Stage 20 has no brief there yet.)*
 
 ---
 
