@@ -57,11 +57,12 @@ export default function App() {
       isFirstRender.current = false
       return
     }
-    // Unless the screen has already placed focus somewhere more useful — the
-    // radical you arrived at from a kanji's breakdown, say. Pulling it back to
-    // the top of <main> would undo that.
+    // Unless the screen has already placed focus inside its own content — the
+    // radical you arrived at from a kanji's breakdown, say. Scoped to the region
+    // a screen marks with data-screen-content, so focus left sitting on a tab in
+    // the toolbar still resets to <main> the way it always has.
     const active = document.activeElement
-    if (active !== mainRef.current && mainRef.current?.contains(active)) return
+    if (active !== mainRef.current && active?.closest?.('[data-screen-content]')) return
     mainRef.current?.focus()
   }, [screenKey, view.mode])
 

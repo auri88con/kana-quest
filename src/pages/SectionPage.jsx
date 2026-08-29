@@ -235,7 +235,7 @@ export default function SectionPage({ view, onChange, onBack }) {
 
       {/* Keyed so switching any tab replays the pane's entrance animation and
           quiz components remount with a fresh question set. */}
-      <div className="section-pane" key={`${mode}:${radicalView}:${tier}:${style}:${script}`}>
+      <div className="section-pane" data-screen-content key={`${mode}:${radicalView}:${tier}:${style}:${script}`}>
         {mode === 'learn' && config.isVerbs && (
           <VerbBrowser section={view.section} characters={tierCharacters} style={style} />
         )}
