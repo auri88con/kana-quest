@@ -10,10 +10,11 @@
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
 
-    <!-- Status/title bar tint. The dark value is also swapped at runtime when the
-         theme setting changes (see src/hooks/useSettings.js). -->
-    <meta name="theme-color" content="#fffaf0" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#221f33" media="(prefers-color-scheme: dark)" />
+    <!-- Status/title bar tint. Deliberately a single media-less tag: the theme is
+         a user setting, not just an OS preference, so the boot script below and
+         src/hooks/useSettings.js keep its content in sync with the resolved
+         theme. A media-scoped tag would win over both. -->
+    <meta name="theme-color" content="#fffaf0" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Kana Quest" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -32,6 +33,8 @@
               : 'light'
         document.documentElement.dataset.theme = theme
         document.documentElement.style.colorScheme = theme
+        var tint = document.querySelector('meta[name="theme-color"]')
+        if (tint) tint.setAttribute('content', theme === 'dark' ? '#221f33' : '#fffaf0')
         if (saved.reduceMotion) document.documentElement.dataset.reduceMotion = 'true'
       } catch (err) {
         /* first run, or storage blocked — the app applies the theme on mount */

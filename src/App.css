@@ -14,6 +14,35 @@
   box-sizing: border-box;
 }
 
+/* Focused programmatically after each navigation (see App.jsx) — the focus ring
+   would be noise on a whole-page container. */
+.app-main:focus {
+  outline: none;
+}
+
+/* Bottom-of-screen notices stack here rather than each positioning itself. */
+.app-toasts {
+  position: fixed;
+  left: 50%;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 40;
+  width: min(440px, calc(100vw - 1.5rem));
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.app-toasts > * {
+  pointer-events: auto;
+}
+
+/* Keep the last card clear of a visible notice. */
+.app-shell:has(.app-toasts > *) .app-main {
+  padding-bottom: calc(8rem + env(safe-area-inset-bottom));
+}
+
 /* Screen-level transition: keyed on the route in App.jsx, so every arrival
    fades and springs up rather than snapping in. */
 .view-swap {

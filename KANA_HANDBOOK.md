@@ -44,7 +44,7 @@ Kana Quest is a Japanese learning web app — hiragana, katakana, kanji and verb
 
 ```
 index.html                 app shell; PWA meta/manifest links + the pre-paint theme script
-vercel.json                SPA rewrite (every route serves index.html) + no-cache headers for sw.js
+vercel.json                SPA rewrite for in-app routes + no-cache headers for sw.js
 scripts/
   service-worker.js         service worker source template (plain JS, never bundled)
   vite-plugin-service-worker.js
@@ -57,7 +57,8 @@ public/
 src/
   main.jsx                 entry point; registers the service worker in production builds
   App.jsx                  screen switcher driven by useRouter; wraps everything in Settings + Progress providers,
-                           lazy-loads SectionPage/Settings behind a Skeleton, renders the install hint
+                           lazy-loads SectionPage/Settings behind a Skeleton and an ErrorBoundary,
+                           moves focus + announces the screen on navigation, renders the toasts
   pages/
     Home.jsx                dashboard: aggregate + per-section stats, section cards
     SectionPage.jsx          mode tabs (Learn/Quiz/Reading) + tier tabs (Kanji, Verbs) for one section;
@@ -65,7 +66,10 @@ src/
     Settings.jsx             appearance, quiz preferences, sound, reset actions, About
   components/
     Header.jsx               logo bar + settings gear
+    ErrorBoundary.jsx        catches render and chunk-load failures; one silent reload, then a card
+                             with a way out (a blank screen is never acceptable)
     InstallPrompt.jsx        dismissible "Install Kana Quest" hint (beforeinstallprompt browsers only)
+    UpdateToast.jsx          "New version ready" notice when a new worker claims the page
     Skeleton.jsx             shimmer placeholder used as the lazy-screen Suspense fallback
     CharacterBrowser.jsx      Learn-mode grid for Hiragana/Katakana (main rows + dakuon/handakuon/yoon sub-tabs)
     CharacterCard.jsx         one card: character, romaji, emoji, example word
@@ -172,7 +176,9 @@ Every screen is addressable, so the phone's back button walks back through the a
 - `SectionPage` holds **no tab state of its own** — mode/tier/style/script come in as `view` props and go out through `onChange`. A new tab dimension means adding it to `routes.js` first
 - Anything unparseable resolves to the `notfound` screen (a card with a way home), never a throw
 - Scroll position is stashed on the entry being left and restored on `popstate`, with `history.scrollRestoration = 'manual'` — coming back to a long grid lands where you were
-- Deep links need the host to serve `index.html` for unknown paths: that's what `vercel.json`'s rewrite does (and what the service worker does offline)
+- Deep links need the host to serve `index.html` for unknown paths: that's what `vercel.json`'s rewrite does (and what the service worker does offline). The rewrite deliberately **excludes** `assets/`, `icons/`, `mascots/`, `sw.js` and the manifest — a missing asset must 404 honestly, because an SPA fallback answering a script request with HTML at 200 is exactly the thing that poisons the offline cache
+- Navigating to the URL you are already on is a no-op, so re-tapping the active tab can't stack entries that make Back look broken
+- After each navigation the main region takes focus and a visually-hidden live region announces the screen ("Kanji, Learn"), so the app is usable without a mouse or eyes
 
 ### Settings & preferences
 
@@ -186,7 +192,7 @@ A second localStorage blob, `kana-quest-settings-v1`, kept separate from progres
   installHintDismissed: false }
 ```
 
-`useSettings` applies them as side effects rather than prop-drilling: `data-theme` and `data-reduce-motion` on `<html>` (the CSS does the rest) plus the `<meta name="theme-color">` tint. `index.html` runs a tiny inline script that reads the same key before first paint, so a dark-theme user never sees a flash of cream — **if the storage key or theme shape changes, that script has to change with it.**
+`useSettings` applies them as side effects rather than prop-drilling: `data-theme` and `data-reduce-motion` on `<html>` (the CSS does the rest) plus the `<meta name="theme-color">` tint. `index.html` runs a tiny inline script that reads the same key before first paint, so a dark-theme user never sees a flash of cream — **if the storage key or theme shape changes, that script has to change with it.** There is exactly one, media-less, `theme-color` tag: the theme is a user setting rather than an OS preference, and a `media`-scoped tag would outrank whatever the script and the hook write into it.
 
 Settings → About shows the version from `package.json`, injected as the `__APP_VERSION__` define in `vite.config.js` — bump `version` when a stage ships (Stage 6.5 set it to `0.6.5`).
 
@@ -199,7 +205,11 @@ Preferences are defaults, not locks: `quiz.answerMode` seeds a quiz's input togg
 - **Service worker**: `scripts/service-worker.js` is a plain-JS template; `scripts/vite-plugin-service-worker.js` stamps in the build's hashed asset list and a cache name derived from it, then emits `dist/sw.js`. A changed build ⇒ a new cache name ⇒ old caches dropped on activate. Build-only, so `npm run dev` stays cache-free
 - **What's precached**: the app shell, every JS/CSS chunk, the woff2 fonts, the manifest and the icons. Deliberately *not* precached: source maps, the woff twins of the woff2 fonts, and the mascot art — those fall to the runtime cache on first use. Fonts are imported as **latin subsets only** (`@fontsource/nunito/latin-400.css`), since the Japanese glyphs come from the system font and the other subsets would be dead weight in the cache
 - **Navigations** are served cache-first from the shell, so a deep link opened offline still boots. The shell is cached by hand (not via `addAll`) because a host that redirects `/index.html` → `/` returns a response flagged as redirected, and handing one of those to a navigation throws
-- **Install hint**: `InstallPrompt` shows only where `beforeinstallprompt` fires, and remembers its dismissal in settings
+- **Precaching is best-effort**: assets are cached one request at a time rather than with `addAll`, which is atomic — a single 404 would reject the whole install and silently leave the app with no offline support at all
+- **HTML is never cached under a non-navigation URL** (see `isCacheable`): belt to the rewrite's braces, so a host with an SPA fallback can't poison a chunk URL permanently
+- **Updates are visible**: a deploy installs in the background and the *next* load is the new build, so `UpdateToast` watches for `controllerchange` and offers the refresh that swaps it in. The first controller a page ever gets is the initial install, not an update, and is ignored
+- **Chunk failures are survivable**: the screens are code-split, so a missing chunk (stale deploy, flaky network) would otherwise unmount the app. `ErrorBoundary` catches it, tries one silent reload — at most one per minute, so a broken build can't loop — and then shows a card with Reload and Back to home
+- **Install hint**: `InstallPrompt` shows only where `beforeinstallprompt` fires, and remembers its dismissal in settings. It and the update notice stack in one fixed `.app-toasts` container, and `.app-shell:has(.app-toasts > *)` pads the page so a notice never covers the last card
 
 ### Adding a whole new section
 
@@ -215,7 +225,7 @@ To add a kanji or verb tier: add the export, an entry in `...Tiers` and `...Tier
 
 Playful and cartoon-friendly — approachable for kids, still good for adults. Sakura pink / indigo / warm cream / red palette. Rounded shapes, bouncy micro-animations. Characters are the hero of every card.
 
-All shared visual primitives — `.btn` (+ `-sakura`/`-outline`/`-danger`), `.icon-btn`, `.back-btn`, `.card-surface`, `.pill-tabs`/`.pill-tab`, `.skeleton`, the `pop-in` / `wiggle` / `correct-bounce` / `flame-flicker` / `view-in` / `pane-in` / `slide-up` / `shimmer` keyframes, and the colour, radius and shadow CSS variables — live in `src/index.css`. Component CSS reuses those rather than redefining colours or shadows.
+All shared visual primitives — `.btn` (+ `-sakura`/`-outline`/`-danger`), `.icon-btn`, `.back-btn`, `.card-surface`, `.pill-tabs`/`.pill-tab`, `.skeleton`, `.toast-bar`, the `pop-in` / `wiggle` / `correct-bounce` / `flame-flicker` / `view-in` / `pane-in` / `slide-up` / `shimmer` keyframes, and the colour, radius and shadow CSS variables — live in `src/index.css`. Component CSS reuses those rather than redefining colours or shadows.
 
 **Hue tokens vs. role tokens.** `:root` defines both: hue tokens (`--color-sakura`, `--color-indigo`, `--color-gold` …) keep their value in every theme, while role tokens are what components should actually reach for — `--color-surface`, `--color-surface-alt`, `--color-ink`, `--color-heading`, `--color-text-muted`, `--color-text-faint`, `--color-border`, `--color-border-soft`, `--color-on-accent` (text on an accent fill, always white), `--color-accent-text` (indigo as *text*, lightened in dark), `--color-success-soft`, `--color-danger-soft`, `--color-page-top`/`--color-page-bottom`. The `:root[data-theme='dark']` block re-points **only the role tokens**, so anything written in roles is themed for free. Adding a hardcoded hex to a component stylesheet is the one thing that breaks dark mode.
 

@@ -73,6 +73,29 @@ export function formatView(view) {
   return query ? `${path}?${query}` : path
 }
 
+const SECTION_LABELS = {
+  hiragana: 'Hiragana',
+  katakana: 'Katakana',
+  kanji: 'Kanji',
+  verbs: 'Verbs',
+}
+
+const MODE_LABELS = {
+  learn: 'Learn',
+  quiz: 'Flashcard Quiz',
+  reading: 'Reading Game',
+  conjugation: 'Conjugation Quiz',
+}
+
+// Spoken by the route announcer after each navigation, so screen-reader users
+// hear where they landed.
+export function viewLabel(view) {
+  if (view.screen === 'settings') return 'Settings'
+  if (view.screen === 'notfound') return 'Page not found'
+  if (view.screen === 'section') return `${SECTION_LABELS[view.section]}, ${MODE_LABELS[view.mode]}`
+  return 'Home'
+}
+
 export function sectionView(section, patch = {}) {
   return { screen: 'section', section, mode: 'learn', tier: 1, style: 'polite', script: null, ...patch }
 }

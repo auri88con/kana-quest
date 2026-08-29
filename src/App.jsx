@@ -1,12 +1,14 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect, useRef } from 'react'
 import { ProgressProvider } from './context/ProgressContext'
 import { SettingsProvider } from './context/SettingsContext'
 import Header from './components/Header'
 import Home from './pages/Home'
 import Skeleton from './components/Skeleton'
 import InstallPrompt from './components/InstallPrompt'
+import UpdateToast from './components/UpdateToast'
+import ErrorBoundary from './components/ErrorBoundary'
 import { useRouter } from './hooks/useRouter'
-import { HOME_VIEW, sectionView } from './utils/routes'
+import { HOME_VIEW, sectionView, viewLabel } from './utils/routes'
 import './App.css'
 
 // Code-split the screens you reach from home: the dashboard paints immediately,
@@ -30,6 +32,9 @@ function NotFound({ onBack }) {
 
 export default function App() {
   const { view, navigate } = useRouter()
+  const mainRef = useRef(null)
+  const isFirstRender = useRef(true)
+  const screenKey = `${view.screen}:${view.section ?? ''}`
 
   const goHome = () => navigate({ ...HOME_VIEW })
   const openSettings = () => navigate({ screen: 'settings' })
@@ -39,25 +44,43 @@ export default function App() {
   // step, tier/style/script refinements replace the entry instead.
   const updateSection = (patch, options) => navigate({ ...view, ...patch }, options)
 
+  // Keyboard and screen-reader users would otherwise be left at the top of the
+  // document after a navigation, with nothing announced.
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+    mainRef.current?.focus()
+  }, [screenKey, view.mode])
+
   return (
     <SettingsProvider>
       <ProgressProvider>
         <div className="app-shell">
           <Header onLogoClick={goHome} onOpenSettings={openSettings} settingsActive={view.screen === 'settings'} />
-          <main className="app-main">
-            <Suspense fallback={<Skeleton />}>
-              {/* Keyed on the screen so each arrival gets its springy entrance. */}
-              <div className="view-swap" key={`${view.screen}:${view.section ?? ''}`}>
-                {view.screen === 'home' && <Home onOpenSection={openSection} />}
-                {view.screen === 'section' && (
-                  <SectionPage view={view} onChange={updateSection} onBack={goHome} />
-                )}
-                {view.screen === 'settings' && <Settings onBack={goHome} />}
-                {view.screen === 'notfound' && <NotFound onBack={goHome} />}
-              </div>
-            </Suspense>
+          <p className="visually-hidden" role="status" aria-live="polite">
+            {viewLabel(view)}
+          </p>
+          <main className="app-main" ref={mainRef} tabIndex={-1}>
+            <ErrorBoundary resetKey={screenKey}>
+              <Suspense fallback={<Skeleton />}>
+                {/* Keyed on the screen so each arrival gets its springy entrance. */}
+                <div className="view-swap" key={screenKey}>
+                  {view.screen === 'home' && <Home onOpenSection={openSection} />}
+                  {view.screen === 'section' && (
+                    <SectionPage view={view} onChange={updateSection} onBack={goHome} />
+                  )}
+                  {view.screen === 'settings' && <Settings onBack={goHome} />}
+                  {view.screen === 'notfound' && <NotFound onBack={goHome} />}
+                </div>
+              </Suspense>
+            </ErrorBoundary>
           </main>
-          <InstallPrompt />
+          <div className="app-toasts">
+            <UpdateToast />
+            <InstallPrompt />
+          </div>
         </div>
       </ProgressProvider>
     </SettingsProvider>

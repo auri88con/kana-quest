@@ -11,7 +11,11 @@
 //                       falling back to the network for a cold cache
 //   same-origin GETs -> cache-first, then network with a runtime cache write,
 //                       so anything not precached (mascot art, fonts added
-//                       later) becomes available offline after its first load
+//                       later) becomes available offline after its first load.
+//                       HTML is never written under a non-navigation URL: a
+//                       host with an SPA fallback answers a missing asset with
+//                       the app shell and a 200, and caching that would poison
+//                       the URL for good
 //   everything else  -> straight to the network
 
 const CACHE_NAME = '__CACHE_NAME__'
@@ -29,11 +33,24 @@ async function precacheShell(cache) {
   await cache.put(APP_SHELL_URL, new Response(body, { status: 200, headers: response.headers }))
 }
 
+// Cached one request at a time rather than with addAll, which is atomic: a
+// single 404 would reject the whole install, leaving the app with no offline
+// support at all and no clue why. A partial cache is worth having.
+async function precacheAssets(cache) {
+  const results = await Promise.allSettled(
+    PRECACHE_URLS.map((url) => cache.add(new Request(url, { cache: 'reload' }))),
+  )
+  const failed = results.filter((result) => result.status === 'rejected').length
+  if (failed) {
+    console.warn(`[kana-quest] ${failed} of ${PRECACHE_URLS.length} assets failed to precache.`)
+  }
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
       .open(CACHE_NAME)
-      .then((cache) => Promise.all([cache.addAll(PRECACHE_URLS), precacheShell(cache)]))
+      .then((cache) => Promise.all([precacheAssets(cache), precacheShell(cache)]))
       .then(() => self.skipWaiting()),
   )
 })
@@ -47,14 +64,22 @@ self.addEventListener('activate', (event) => {
   )
 })
 
+function isCacheable(request, response) {
+  // Opaque/error responses are never worth persisting.
+  if (!response.ok || response.type !== 'basic') return false
+  // An SPA fallback answers "/assets/gone.js" with the app shell at 200. Cache
+  // that and the URL serves HTML forever, so the script can never load again.
+  const isHtml = (response.headers.get('content-type') || '').includes('text/html')
+  return !isHtml || request.mode === 'navigate'
+}
+
 async function cacheFirst(request, fallbackUrl) {
   const cache = await caches.open(CACHE_NAME)
   const cached = await cache.match(request, { ignoreSearch: true })
   if (cached) return cached
   try {
     const response = await fetch(request)
-    // Opaque/error responses are never worth persisting.
-    if (response.ok && response.type === 'basic') cache.put(request, response.clone())
+    if (isCacheable(request, response)) cache.put(request, response.clone())
     return response
   } catch (err) {
     if (fallbackUrl) {

@@ -10,7 +10,9 @@ function currentView() {
  * History-API router for the app's handful of screens.
  *
  * - `navigate(view)` pushes a history entry (screen and mode changes), so the
- *   browser/phone back button steps back through the app
+ *   browser/phone back button steps back through the app. Navigating to the URL
+ *   you are already on is a no-op — re-tapping the active tab (or the logo on
+ *   home) must not stack entries that make Back look broken
  * - `navigate(view, { replace: true })` swaps the current entry instead — used
  *   for tab refinements (tier, polite/plain, kanji/kana) so the back button
  *   isn't clogged with them
@@ -42,12 +44,15 @@ export function useRouter() {
     pendingScroll.current = null
     // The restored grid may still be laying out; a frame later is reliably
     // after paint on every browser we care about.
-    window.scrollTo({ top, behavior: 'instant' })
-    requestAnimationFrame(() => window.scrollTo({ top, behavior: 'instant' }))
+    // Two-argument scrollTo rather than the options object: it is always
+    // instant, and it doesn't depend on `behavior: 'instant'` support.
+    window.scrollTo(0, top)
+    requestAnimationFrame(() => window.scrollTo(0, top))
   }, [view])
 
   const navigate = useCallback((next, { replace = false } = {}) => {
     const url = formatView(next)
+    if (!replace && url === window.location.pathname + window.location.search) return
     if (replace) {
       window.history.replaceState({ ...window.history.state, view: next.screen }, '', url)
     } else {

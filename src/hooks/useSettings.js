@@ -34,8 +34,13 @@ export function useSettings() {
     const root = document.documentElement
     root.dataset.theme = resolvedTheme
     root.style.colorScheme = resolvedTheme
-    const meta = document.querySelector('meta[name="theme-color"]:not([media])')
-    if (meta) meta.setAttribute('content', THEME_COLORS[resolvedTheme])
+    let meta = document.querySelector('meta[name="theme-color"]')
+    if (!meta) {
+      meta = document.createElement('meta')
+      meta.name = 'theme-color'
+      document.head.appendChild(meta)
+    }
+    meta.setAttribute('content', THEME_COLORS[resolvedTheme])
   }, [resolvedTheme])
 
   useEffect(() => {

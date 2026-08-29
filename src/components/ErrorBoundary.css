@@ -1,0 +1,27 @@
+.app-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 3rem 2rem;
+  margin: 0 auto;
+  text-align: center;
+  border: 3px dashed var(--color-border-soft);
+  max-width: 480px;
+}
+
+.app-error-emoji {
+  font-size: 3rem;
+}
+
+.app-error p {
+  color: var(--color-text-muted);
+  margin-bottom: 0.6rem;
+}
+
+.app-error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}

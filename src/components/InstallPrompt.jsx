@@ -51,13 +51,13 @@ export default function InstallPrompt() {
   }
 
   return (
-    <div className="install-prompt anim-slide-up" role="dialog" aria-label="Install Kana Quest">
-      <span className="install-prompt-icon" aria-hidden="true">📲</span>
-      <div className="install-prompt-text">
+    <div className="toast-bar install-prompt anim-slide-up" role="dialog" aria-label="Install Kana Quest">
+      <span className="toast-bar-icon" aria-hidden="true">📲</span>
+      <div className="toast-bar-text">
         <strong>Install Kana Quest</strong>
         <span>Add it to your home screen — it works offline.</span>
       </div>
-      <div className="install-prompt-actions">
+      <div className="toast-bar-actions">
         <button type="button" className="btn btn-sakura install-prompt-cta" onClick={install}>
           Install
         </button>
