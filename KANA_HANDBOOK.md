@@ -50,6 +50,7 @@ scripts/
   vite-plugin-service-worker.js
                             build plugin: stamps the hashed asset list into the template, emits dist/sw.js
   generate-icons.mjs        one-off: rasterises public/icons/icon.svg into the PNG icon set
+  check-radicals.mjs        validates the radical set and every kanji breakdown (npm run check:radicals)
 public/
   manifest.webmanifest      name, colours, icons, section shortcuts
   icons/                    icon.svg (source + favicon) and the generated PNGs
@@ -61,7 +62,7 @@ src/
                            moves focus + announces the screen on navigation, renders the toasts
   pages/
     Home.jsx                dashboard: aggregate + per-section stats, section cards
-    SectionPage.jsx          mode tabs (Learn/Quiz/Reading) + tier tabs (Kanji, Verbs) for one section;
+    SectionPage.jsx          mode tabs (Learn/Radicals/Quiz/Reading) + tier tabs (Kanji, Verbs) for one section;
                              fully controlled by the route — it holds no tab state of its own
     Settings.jsx             appearance, quiz preferences, sound, reset actions, About
   components/
@@ -74,11 +75,15 @@ src/
     CharacterBrowser.jsx      Learn-mode grid for Hiragana/Katakana (main rows + dakuon/handakuon/yoon sub-tabs)
     CharacterCard.jsx         one card: character, romaji, emoji, example word
     KanjiBrowser.jsx          Learn-mode grid for Kanji (flat grid per tier)
-    KanjiCard.jsx             like CharacterCard but adds a meaning line
+    KanjiCard.jsx             like CharacterCard but adds a meaning line and, where the data has one,
+                              a "built from" / "contains" radical breakdown
+    RadicalBrowser.jsx        Radicals-mode grid: the learn-these-first panel + the six radical groups
+    RadicalCard.jsx           one radical: shape, stroke count, variants, name/nickname, and the kanji it appears in
     VerbBrowser.jsx           Learn-mode grid for Verbs (flat grid per tier)
     VerbCard.jsx              dictionary form as hero + the conjugation table for the active style
     FlashcardQuiz.jsx         shared quiz engine for all sections; kanji/verbs pass an `answerModes` prop
-                              to add a Reading/Meaning toggle on top of Multiple-Choice/Type
+                              to add a Reading/Meaning toggle on top of Multiple-Choice/Type, and any caller whose
+                              items have no example word passes `noteFor` for the feedback line
     ConjugationQuiz.jsx       verbs only: verb + target form -> typed or multiple-choice answer
     ReadingGame.jsx           shared reading-game engine; 5 levels, progressive unlock, forgiving romaji
     StreakStat.jsx            the streak pill; escalates animation/colour at streak 5 and 10
@@ -98,12 +103,14 @@ src/
     routes.js                 URL <-> view mapping (parseLocation / formatView / sectionView)
     sound.js                  synthesised WebAudio blips for correct / wrong / streak milestone
     quiz.js                   pickRandom, buildMultipleChoiceOptions - generic over a `keyFn`
+    radicals.js               derived cross-references: kanjiByRadical (reverse index), componentsOf(kanji)
     conjugate.js              the conjugation engine: POLITE_LABELS, PLAIN_LABELS, conjugate(verb)
     romaji.js                 forgiving romaji matching (shi/si, tsu/tu, chi/ti, fu/hu, ja/zya, wo/o, ...)
     messages.js               random encouraging/consoling quiz feedback strings
   data/
     hiragana.js, katakana.js  character sets grouped into main rows / voiced / handakuon / yoon
-    kanji.js                  4 tiers of kanji
+    kanji.js                  4 tiers of kanji, Tier 1 annotated with its component radicals
+    radicals.js               the 66 common radicals, grouped
     verbs.js                  3 tiers of verbs, each tagged with its conjugation group
     readingGame.js            reading-game vocabulary, per section, per level (1-5)
 ```
@@ -127,6 +134,31 @@ Plain CSS, one `.css` file per component, class names global by convention. No T
 ```
 
 `romaji` is the single most common reading in isolation — on'yomi for verb/adjective-type kanji, kun'yomi for standalone native nouns (see the comment block at the top of the file). `meaning` may hold two alternates separated by ` / `, but the meaning quiz only uses the *first*, so prefer a single primary meaning.
+
+Tier 1 entries also carry the radicals they are made of:
+
+```js
+{ char: '休', ..., components: ['人', '木'] }                  // built from — every stroke accounted for
+{ char: '週', ..., components: ['辶', '口'], partial: true }   // contains — the named parts don't cover it all
+```
+
+Components reference a radical's canonical `char` (`人`, not `亻`). A kanji only gets a breakdown when its parts
+are genuinely in the radical set — pictographs and anything uncertain are left blank rather than guessed at, which is
+why 47 of the 105 Tier 1 kanji have one. **Never invent a decomposition to fill the gap.**
+
+**`data/radicals.js`** — `radicals` (66 entries), `radicalGroups`, `radicalsByGroup` (for the grid), `radicalByChar`
+and `radicalByAnyForm` (canonical form *and* variants → the entry, so a component written `亻` still resolves):
+
+```js
+{ char: '人', name: 'person', nickname: 'person', meaning: 'a person standing on two legs',
+  emoji: '🧍', strokes: 2, variants: ['亻'], group: 'people' }
+```
+
+`name` is the real traditional meaning, `nickname` a plain-English hint at the shape (the card hides it when the two
+match), `meaning` describes what the shape depicts. Every entry is a genuine Kangxi radical. `utils/radicals.js`
+derives the reverse index (which kanji use a radical) rather than storing it, so the two files cannot drift apart.
+`npm run check:radicals` fails if a kanji names a radical that is not in the set, if `partial` appears without
+components, or if two radicals claim the same glyph.
 
 **`data/verbs.js`** — `verbTier1`–`verbTier3`, plus `verbTiers`, `verbTierMeta` and `verbAllCharacters`:
 
@@ -152,10 +184,19 @@ One JSON blob in `localStorage` under `kana-quest-progress-v1`:
   katakana: { ...same },
   kanji:    { ...same },
   verbs:    { ...same, conjugation: { polite: {...}, plain: {...} } },
+  radicals: { seenCharacters: [...], quiz: { attempts, correct, bestStreak }, mastery: { '人': {...} } },
 }
 ```
 
 `utils/storage.js` merges saved data onto fresh defaults **section-by-section and field-by-field** (not a shallow top-level spread), so adding a new progress field later doesn't wipe itself back to `undefined` for existing users — that's how `readingGame` and `conjugation` were added without migrations. Keep that pattern, and keep new mastery data SRS-ready (Stage 9 must pick it up without a migration).
+
+Radicals are a **top-level bucket, not part of `kanji`** — radical practice would otherwise inflate the kanji quiz
+stats, and the shared components can address them with `section="radicals"` like any other section. Its `mastery`
+map is keyed by radical `char` → `{ attempts, correct, lastCorrect, lastPracticedAt }` — the same per-item record
+`verbMastery` keeps, but named generically so any section can gain one in the SRS stage with no migration.
+`recordQuizAnswer(section, isCorrect, streak, itemChar)` writes it whenever the section has a `mastery` map, and
+ignores `itemChar` when it doesn't. Only the four character sections appear on the dashboard totals; radicals
+surface as an extra mini-stat on the Kanji card.
 
 ### Routing & navigation
 
@@ -166,6 +207,7 @@ Every screen is addressable, so the phone's back button walks back through the a
 /settings                      settings screen
 /hiragana                      a section in its default Learn mode
 /kanji/quiz?tier=2             a section mode, with its tab state in the query
+/kanji/radicals                the radical grid (Kanji only); ?view=quiz for the radical quiz
 /verbs/conjugation?tier=1&style=plain
 ```
 
@@ -282,8 +324,8 @@ They react after quizzes, celebrate streaks and milestones, and idle on the home
 | 5 | Polish & gamification, dashboard, streaks | ✅ Done |
 | 6 | Verbs tab — 3 tiers, polite/plain conjugations, conjugation quiz | ✅ Done |
 | 6.5 | Feel & flow — installable PWA + offline, depth/press/motion pass, dark theme, history-API navigation, settings screen | ✅ Done |
-| 7 | Radicals system | ⬜ Next |
-| 8 | Mnemonics & stories | ⬜ |
+| 7 | Radicals system — 66 radicals, kanji breakdowns, radical quiz | ✅ Done |
+| 8 | Mnemonics & stories | ⬜ Next |
 | 9 | Spaced repetition (SRS) | ⬜ |
 | 10 | Font trainer | ⬜ |
 | 11 | Writing practice | ⬜ |

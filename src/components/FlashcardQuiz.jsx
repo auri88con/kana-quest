@@ -26,7 +26,23 @@ function isAnswerMatch(input, targetKey, correctValue) {
   return input.trim().toLowerCase() === correctValue.trim().toLowerCase()
 }
 
-export default function FlashcardQuiz({ section, characters, answerModes = DEFAULT_ANSWER_MODES, promptKey = 'char' }) {
+// The line under the feedback headline. Characters carry an example word;
+// callers whose items don't (radicals) pass their own.
+function defaultNote(item) {
+  return (
+    <>
+      {item.word.kana} <span className="quiz-feedback-romaji">({item.word.romaji})</span> — {item.word.meaning}
+    </>
+  )
+}
+
+export default function FlashcardQuiz({
+  section,
+  characters,
+  answerModes = DEFAULT_ANSWER_MODES,
+  promptKey = 'char',
+  noteFor = defaultNote,
+}) {
   const { recordQuizAnswer } = useProgressContext()
   const { settings } = useSettingsContext()
   // Seeded from the saved preference; switching it here is just for this session.
@@ -54,7 +70,9 @@ export default function FlashcardQuiz({ section, characters, answerModes = DEFAU
   }
 
   const correctValue = answerValue(current, target)
-  const promptLabel = answerModes.find((m) => m.key === target)?.prompt ?? DEFAULT_ANSWER_MODES[0].prompt
+  const activeMode = answerModes.find((m) => m.key === target)
+  const promptLabel = activeMode?.prompt ?? DEFAULT_ANSWER_MODES[0].prompt
+  const typePlaceholder = activeMode?.placeholder ?? (target === 'meaning' ? 'type the meaning…' : 'type the romaji…')
 
   function refreshQuestion(next, nextTarget = target) {
     setCurrent(next)
@@ -83,7 +101,7 @@ export default function FlashcardQuiz({ section, characters, answerModes = DEFAU
     setStreak(newStreak)
     setBestStreak((b) => Math.max(b, newStreak))
     if (isCorrect) setScore((s) => s + 1)
-    recordQuizAnswer(section, isCorrect, newStreak)
+    recordQuizAnswer(section, isCorrect, newStreak, current.char)
     const milestone = isCorrect && newStreak > 0 && newStreak % STREAK_MILESTONE === 0
     if (settings.sound) playSound(milestone ? 'celebrate' : isCorrect ? 'correct' : 'wrong')
     if (milestone) {
@@ -180,7 +198,7 @@ export default function FlashcardQuiz({ section, characters, answerModes = DEFAU
               value={typedAnswer}
               onChange={(e) => setTypedAnswer(e.target.value)}
               disabled={!!feedback}
-              placeholder={target === 'meaning' ? 'type the meaning…' : 'type the romaji…'}
+              placeholder={typePlaceholder}
               autoComplete="off"
               autoCapitalize="off"
               spellCheck={false}
@@ -197,10 +215,7 @@ export default function FlashcardQuiz({ section, characters, answerModes = DEFAU
         {feedback && (
           <div className={`quiz-feedback ${feedback}`}>
             <p className="quiz-feedback-headline">{feedbackMessage}</p>
-            <p className="quiz-feedback-word">
-              {current.word.kana} <span className="quiz-feedback-romaji">({current.word.romaji})</span> —{' '}
-              {current.word.meaning}
-            </p>
+            <p className="quiz-feedback-word">{noteFor(current)}</p>
             <button className="btn" onClick={nextQuestion}>
               Next →
             </button>

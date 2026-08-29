@@ -1,0 +1,98 @@
+/* Sits on top of .kana-card: same surface, edge and press behaviour, but a
+   taller body with room for the shape, its variants and where it turns up. */
+.radical-card {
+  justify-content: flex-start;
+  padding-top: 1.35rem;
+  gap: 0.3rem;
+}
+
+.radical-card-strokes {
+  position: absolute;
+  top: -10px;
+  left: -6px;
+  display: flex;
+  align-items: baseline;
+  gap: 0.15rem;
+  padding: 0.1rem 0.45rem;
+  background: var(--color-surface-alt);
+  border: 2px solid var(--color-border-soft);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--color-accent-text);
+  box-shadow: var(--shadow-badge);
+}
+
+.radical-card-strokes-unit {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.radical-card-variants {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.radical-card-variants-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-faint);
+}
+
+.radical-card-variant {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--color-sakura-deep);
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-sm);
+  padding: 0.1rem 0.35rem;
+}
+
+.radical-card-nickname {
+  font-size: 0.75rem;
+  color: var(--color-sakura-deep);
+  font-weight: 600;
+}
+
+.radical-card-meaning {
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.radical-card-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
+  width: 100%;
+  border-top: 2px dotted var(--color-border-soft);
+}
+
+.radical-card-examples-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-faint);
+}
+
+.radical-card-examples-chars {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: 1.3;
+  color: var(--color-ink);
+  word-break: break-word;
+}

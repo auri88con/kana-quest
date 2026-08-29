@@ -28,7 +28,7 @@ const SECTION_TIERS = {
 export const SECTION_MODES = {
   hiragana: ['learn', 'quiz', 'reading'],
   katakana: ['learn', 'quiz', 'reading'],
-  kanji: ['learn', 'quiz', 'reading'],
+  kanji: ['learn', 'radicals', 'quiz', 'reading'],
   verbs: ['learn', 'quiz', 'reading', 'conjugation'],
 }
 
@@ -36,6 +36,8 @@ export const HOME_VIEW = { screen: 'home' }
 
 const STYLES = ['polite', 'plain']
 const SCRIPTS = ['char', 'kana']
+// Radicals mode has two panes of its own rather than a fifth top-level tab.
+const RADICAL_VIEWS = ['browse', 'quiz']
 
 function parseTier(raw, section) {
   const tier = Number(raw)
@@ -58,12 +60,14 @@ export function parseLocation(pathname, search = '') {
   const params = new URLSearchParams(search)
   const style = params.get('style')
   const script = params.get('script')
+  const radicalView = params.get('view')
 
   return {
     screen: 'section',
     section,
     mode,
     tier: parseTier(params.get('tier'), section),
+    radicalView: RADICAL_VIEWS.includes(radicalView) ? radicalView : 'browse',
     style: STYLES.includes(style) ? style : 'polite',
     // Left null when absent so the section page can fall back to the user's
     // saved kanji/kana preference instead of a hardcoded default.
@@ -77,6 +81,9 @@ export function formatView(view) {
 
   const params = new URLSearchParams()
   if (view.tier && view.tier !== 1) params.set('tier', String(view.tier))
+  // Scoped to the mode that owns it, so a detour through Radicals doesn't leave
+  // `?view=quiz` hanging off the Learn URL.
+  if (view.mode === 'radicals' && view.radicalView === 'quiz') params.set('view', 'quiz')
   if (view.style && view.style !== 'polite') params.set('style', view.style)
   if (view.script) params.set('script', view.script)
 
@@ -94,6 +101,7 @@ const SECTION_LABELS = {
 
 const MODE_LABELS = {
   learn: 'Learn',
+  radicals: 'Radicals',
   quiz: 'Flashcard Quiz',
   reading: 'Reading Game',
   conjugation: 'Conjugation Quiz',
@@ -104,10 +112,23 @@ const MODE_LABELS = {
 export function viewLabel(view) {
   if (view.screen === 'settings') return 'Settings'
   if (view.screen === 'notfound') return 'Page not found'
-  if (view.screen === 'section') return `${SECTION_LABELS[view.section]}, ${MODE_LABELS[view.mode]}`
+  if (view.screen === 'section') {
+    const mode =
+      view.mode === 'radicals' && view.radicalView === 'quiz' ? 'Radicals Quiz' : MODE_LABELS[view.mode]
+    return `${SECTION_LABELS[view.section]}, ${mode}`
+  }
   return 'Home'
 }
 
 export function sectionView(section, patch = {}) {
-  return { screen: 'section', section, mode: 'learn', tier: 1, style: 'polite', script: null, ...patch }
+  return {
+    screen: 'section',
+    section,
+    mode: 'learn',
+    tier: 1,
+    radicalView: 'browse',
+    style: 'polite',
+    script: null,
+    ...patch,
+  }
 }

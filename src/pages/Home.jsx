@@ -1,6 +1,7 @@
 import { hiraganaAllCharacters } from '../data/hiragana'
 import { katakanaAllCharacters } from '../data/katakana'
 import { kanjiAllCharacters } from '../data/kanji'
+import { radicals } from '../data/radicals'
 import { verbAllCharacters } from '../data/verbs'
 import { useProgressContext } from '../context/ProgressContext'
 import './Home.css'
@@ -15,6 +16,9 @@ const SECTION_META = {
 export default function Home({ onOpenSection }) {
   const { progress } = useProgressContext()
   const sections = Object.entries(SECTION_META)
+  // Radicals sit outside SECTION_META so they don't skew the overall totals;
+  // they surface as an extra stat on the Kanji card, where they belong.
+  const radicalsSeen = progress.radicals?.seenCharacters.length ?? 0
 
   const totalSeen = sections.reduce((sum, [key]) => sum + (progress[key]?.seenCharacters.length ?? 0), 0)
   const totalChars = sections.reduce((sum, [, meta]) => sum + meta.total, 0)
@@ -94,6 +98,11 @@ export default function Home({ onOpenSection }) {
                     <span className="mini-stat" title="Reading game level unlocked">
                       📝 Lv{sectionReadingLevel}/5
                     </span>
+                    {key === 'kanji' && (
+                      <span className="mini-stat" title="Radicals met">
+                        🧩 {radicalsSeen}/{radicals.length}
+                      </span>
+                    )}
                   </div>
                 </>
               ) : (

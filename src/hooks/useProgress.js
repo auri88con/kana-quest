@@ -2,6 +2,22 @@ import { useCallback, useEffect, useState } from 'react'
 import { defaultProgress, loadProgress, saveProgress } from '../utils/storage'
 import { READING_GAME_UNLOCK_THRESHOLD } from '../data/readingGame'
 
+// A per-item accuracy/recency record, in the shape the SRS stage schedules
+// from. Shared by conjugation practice and by any section that keeps a
+// section-level `mastery` map (radicals, today).
+function bumpMastery(map, key, isCorrect) {
+  const prior = map[key] ?? { attempts: 0, correct: 0, lastCorrect: false, lastPracticedAt: 0 }
+  return {
+    ...map,
+    [key]: {
+      attempts: prior.attempts + 1,
+      correct: prior.correct + (isCorrect ? 1 : 0),
+      lastCorrect: isCorrect,
+      lastPracticedAt: Date.now(),
+    },
+  }
+}
+
 export function useProgress() {
   const [progress, setProgress] = useState(loadProgress)
 
@@ -23,21 +39,24 @@ export function useProgress() {
     })
   }, [])
 
-  const recordQuizAnswer = useCallback((section, isCorrect, streakAfter) => {
+  // `itemChar` is optional: sections that keep a `mastery` map also get a
+  // per-item record, and the ones that don't simply ignore it.
+  const recordQuizAnswer = useCallback((section, isCorrect, streakAfter, itemChar) => {
     setProgress((prev) => {
       const sectionData = prev[section] ?? defaultProgress()[section]
       const quiz = sectionData.quiz
-      return {
-        ...prev,
-        [section]: {
-          ...sectionData,
-          quiz: {
-            attempts: quiz.attempts + 1,
-            correct: quiz.correct + (isCorrect ? 1 : 0),
-            bestStreak: Math.max(quiz.bestStreak, streakAfter),
-          },
+      const next = {
+        ...sectionData,
+        quiz: {
+          attempts: quiz.attempts + 1,
+          correct: quiz.correct + (isCorrect ? 1 : 0),
+          bestStreak: Math.max(quiz.bestStreak, streakAfter),
         },
       }
+      if (sectionData.mastery && itemChar) {
+        next.mastery = bumpMastery(sectionData.mastery, itemChar, isCorrect)
+      }
+      return { ...prev, [section]: next }
     })
   }, [])
 
@@ -79,12 +98,6 @@ export function useProgress() {
     setProgress((prev) => {
       const sectionData = prev.verbs ?? defaultProgress().verbs
       const styleProgress = sectionData.conjugation[style]
-      const prior = styleProgress.verbMastery[verbChar] ?? {
-        attempts: 0,
-        correct: 0,
-        lastCorrect: false,
-        lastPracticedAt: 0,
-      }
       return {
         ...prev,
         verbs: {
@@ -95,15 +108,7 @@ export function useProgress() {
               attempts: styleProgress.attempts + 1,
               correct: styleProgress.correct + (isCorrect ? 1 : 0),
               bestStreak: Math.max(styleProgress.bestStreak, streakAfter),
-              verbMastery: {
-                ...styleProgress.verbMastery,
-                [verbChar]: {
-                  attempts: prior.attempts + 1,
-                  correct: prior.correct + (isCorrect ? 1 : 0),
-                  lastCorrect: isCorrect,
-                  lastPracticedAt: Date.now(),
-                },
-              },
+              verbMastery: bumpMastery(styleProgress.verbMastery, verbChar, isCorrect),
             },
           },
         },

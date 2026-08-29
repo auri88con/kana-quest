@@ -1,6 +1,7 @@
 import CharacterBrowser from '../components/CharacterBrowser'
 import KanjiBrowser from '../components/KanjiBrowser'
 import VerbBrowser from '../components/VerbBrowser'
+import RadicalBrowser from '../components/RadicalBrowser'
 import FlashcardQuiz from '../components/FlashcardQuiz'
 import ReadingGame from '../components/ReadingGame'
 import ConjugationQuiz from '../components/ConjugationQuiz'
@@ -22,11 +23,18 @@ import {
 } from '../data/katakana'
 import { kanjiAllCharacters, kanjiTiers, kanjiTierMeta } from '../data/kanji'
 import { verbAllCharacters, verbTiers, verbTierMeta } from '../data/verbs'
+import { radicals } from '../data/radicals'
 import './SectionPage.css'
 
 const KANJI_ANSWER_MODES = [
   { key: 'romaji', label: 'Reading', prompt: 'What is the reading?' },
   { key: 'meaning', label: 'Meaning', prompt: 'What does this mean?' },
+]
+
+// One target only: a radical's nickname is often the same word as its meaning,
+// so a second mode would be asking the same question twice.
+const RADICAL_ANSWER_MODES = [
+  { key: 'name', label: 'Meaning', prompt: 'What is this part?', placeholder: 'type the meaning…' },
 ]
 
 const VERB_ANSWER_MODES = [
@@ -79,6 +87,7 @@ export default function SectionPage({ view, onChange, onBack }) {
   const config = SECTION_CONFIG[view.section]
   const mode = view.mode
   const style = view.style
+  const radicalView = view.radicalView
   const script = view.script ?? settings.quiz.verbScript
   // Validated against this section's real tier list in utils/routes.js.
   const tier = view.tier
@@ -117,6 +126,15 @@ export default function SectionPage({ view, onChange, onBack }) {
         >
           📖 Learn
         </button>
+        {config.isKanji && (
+          <button
+            type="button"
+            className={`pill-tab ${mode === 'radicals' ? 'is-active' : ''}`}
+            onClick={() => onChange({ mode: 'radicals' })}
+          >
+            🧩 Radicals
+          </button>
+        )}
         <button
           type="button"
           className={`pill-tab ${mode === 'quiz' ? 'is-active' : ''}`}
@@ -155,6 +173,25 @@ export default function SectionPage({ view, onChange, onBack }) {
               {meta.label}
             </button>
           ))}
+        </div>
+      )}
+
+      {mode === 'radicals' && (
+        <div className="pill-tabs radical-view-tabs">
+          <button
+            type="button"
+            className={`pill-tab ${radicalView === 'browse' ? 'is-active' : ''}`}
+            onClick={() => onChange({ radicalView: 'browse' }, { replace: true })}
+          >
+            Browse
+          </button>
+          <button
+            type="button"
+            className={`pill-tab ${radicalView === 'quiz' ? 'is-active' : ''}`}
+            onClick={() => onChange({ radicalView: 'quiz' }, { replace: true })}
+          >
+            Quiz
+          </button>
         </div>
       )}
 
@@ -198,12 +235,25 @@ export default function SectionPage({ view, onChange, onBack }) {
 
       {/* Keyed so switching any tab replays the pane's entrance animation and
           quiz components remount with a fresh question set. */}
-      <div className="section-pane" key={`${mode}:${tier}:${style}:${script}`}>
+      <div className="section-pane" key={`${mode}:${radicalView}:${tier}:${style}:${script}`}>
         {mode === 'learn' && config.isVerbs && (
           <VerbBrowser section={view.section} characters={tierCharacters} style={style} />
         )}
 
         {mode === 'learn' && config.isKanji && <KanjiBrowser section={view.section} characters={tierCharacters} />}
+
+        {mode === 'radicals' && radicalView === 'browse' && (
+          <RadicalBrowser onOpenLearn={() => onChange({ mode: 'learn' })} />
+        )}
+
+        {mode === 'radicals' && radicalView === 'quiz' && (
+          <FlashcardQuiz
+            section="radicals"
+            characters={radicals}
+            answerModes={RADICAL_ANSWER_MODES}
+            noteFor={(radical) => radical.meaning}
+          />
+        )}
 
         {mode === 'learn' && !config.isVerbs && !config.isKanji && (
           <CharacterBrowser

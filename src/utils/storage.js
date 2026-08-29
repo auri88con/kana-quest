@@ -36,11 +36,25 @@ const defaultVerbSectionProgress = () => ({
   },
 })
 
+// Radicals are their own progress bucket rather than a nested part of `kanji`,
+// so radical practice doesn't inflate the kanji quiz stats and the shared
+// components can address them with `section="radicals"` like anything else.
+//
+// `mastery` is keyed by radical `char` -> the same per-item record verbMastery
+// keeps. It's deliberately a plain section-level map: any other section can
+// gain one in the SRS stage without a migration or a new code path.
+const defaultRadicalsProgress = () => ({
+  seenCharacters: [],
+  quiz: { attempts: 0, correct: 0, bestStreak: 0 },
+  mastery: {},
+})
+
 export const defaultProgress = () => ({
   hiragana: defaultSectionProgress(),
   katakana: defaultSectionProgress(),
   kanji: defaultSectionProgress(),
   verbs: defaultVerbSectionProgress(),
+  radicals: defaultRadicalsProgress(),
 })
 
 function mergeConjugationStyleProgress(defaults, saved) {
@@ -56,17 +70,25 @@ function mergeConjugationStyleProgress(defaults, saved) {
 // shallow top-level spread) so progress saved before a new nested field was
 // introduced (e.g. readingGame, conjugation) doesn't wipe that field back to
 // undefined.
+// Each nested block is merged only when this section actually has one, so a
+// section without a reading game (radicals) travels through the same path as
+// the ones that do.
 function mergeSectionProgress(defaults, saved) {
   if (!saved) return defaults
   const merged = {
     ...defaults,
     ...saved,
     quiz: { ...defaults.quiz, ...saved.quiz },
-    readingGame: {
+  }
+  if (defaults.readingGame) {
+    merged.readingGame = {
       ...defaults.readingGame,
       ...saved.readingGame,
       levelProgress: { ...defaults.readingGame.levelProgress, ...saved.readingGame?.levelProgress },
-    },
+    }
+  }
+  if (defaults.mastery) {
+    merged.mastery = { ...defaults.mastery, ...saved.mastery }
   }
   if (defaults.conjugation) {
     merged.conjugation = {

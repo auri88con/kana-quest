@@ -5,3 +5,62 @@
   color: var(--color-accent-text);
   text-transform: capitalize;
 }
+
+/* "Built from" breakdown. Only the kanji that carry `components` render this,
+   so the grid stays even-height by group rather than every card growing. */
+.kanji-parts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
+  margin-top: 0.55rem;
+  padding-top: 0.5rem;
+  border-top: 2px dotted var(--color-border-soft);
+}
+
+.kanji-parts-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-faint);
+}
+
+.kanji-parts-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem 0.3rem;
+}
+
+.kanji-parts-plus {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--color-text-faint);
+}
+
+.kanji-parts-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.22rem;
+  padding: 0.12rem 0.4rem;
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-pill);
+  line-height: 1.2;
+}
+
+.kanji-parts-chip-char {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-sakura-deep);
+}
+
+.kanji-parts-chip-name {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
