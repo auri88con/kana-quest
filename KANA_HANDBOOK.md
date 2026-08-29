@@ -18,8 +18,9 @@ Kana Quest is a Japanese learning web app — hiragana, katakana, kanji and verb
 
 - **Vite + React** — frontend
 - **Plain CSS** — no framework
-- **localStorage** — all progress persistence (no backend yet; Firebase planned for Stages 15–17)
-- **Fully offline capable**, responsive, mobile-first
+- **localStorage** — all progress *and* preference persistence (no backend yet; Firebase planned for Stages 15–17)
+- **Installable PWA** — web app manifest + a build-generated service worker; **fully offline capable**, responsive, mobile-first
+- **History-API routing** — hand-rolled (`utils/routes.js` + `hooks/useRouter.js`), no router library
 
 ---
 
@@ -42,14 +43,30 @@ Kana Quest is a Japanese learning web app — hiragana, katakana, kanji and verb
 ### Codebase map
 
 ```
+index.html                 app shell; PWA meta/manifest links + the pre-paint theme script
+vercel.json                SPA rewrite (every route serves index.html) + no-cache headers for sw.js
+scripts/
+  service-worker.js         service worker source template (plain JS, never bundled)
+  vite-plugin-service-worker.js
+                            build plugin: stamps the hashed asset list into the template, emits dist/sw.js
+  generate-icons.mjs        one-off: rasterises public/icons/icon.svg into the PNG icon set
+public/
+  manifest.webmanifest      name, colours, icons, section shortcuts
+  icons/                    icon.svg (source + favicon) and the generated PNGs
+  mascots/                  Nyasuke, Kon, Poko (Stage 14)
 src/
-  main.jsx                 entry point
-  App.jsx                  top-level view router (home vs. a section), wraps everything in ProgressProvider
+  main.jsx                 entry point; registers the service worker in production builds
+  App.jsx                  screen switcher driven by useRouter; wraps everything in Settings + Progress providers,
+                           lazy-loads SectionPage/Settings behind a Skeleton, renders the install hint
   pages/
     Home.jsx                dashboard: aggregate + per-section stats, section cards
-    SectionPage.jsx          mode tabs (Learn/Quiz/Reading) + tier tabs (Kanji, Verbs) for one section
+    SectionPage.jsx          mode tabs (Learn/Quiz/Reading) + tier tabs (Kanji, Verbs) for one section;
+                             fully controlled by the route — it holds no tab state of its own
+    Settings.jsx             appearance, quiz preferences, sound, reset actions, About
   components/
-    Header.jsx               logo bar
+    Header.jsx               logo bar + settings gear
+    InstallPrompt.jsx        dismissible "Install Kana Quest" hint (beforeinstallprompt browsers only)
+    Skeleton.jsx             shimmer placeholder used as the lazy-screen Suspense fallback
     CharacterBrowser.jsx      Learn-mode grid for Hiragana/Katakana (main rows + dakuon/handakuon/yoon sub-tabs)
     CharacterCard.jsx         one card: character, romaji, emoji, example word
     KanjiBrowser.jsx          Learn-mode grid for Kanji (flat grid per tier)
@@ -64,11 +81,18 @@ src/
     Celebration.jsx           pop-in toast for streak milestones and reading-game level-ups
   context/
     ProgressContext.jsx       thin context wrapper around useProgress
+    SettingsContext.jsx       thin context wrapper around useSettings
   hooks/
     useProgress.js            all progress-mutating logic: markCharacterSeen, recordQuizAnswer,
                               recordReadingAnswer (reading-game level unlocks), recordConjugationAnswer
+    useSettings.js            preference state + persistence, and the side effects that apply it
+                              (root data-theme / data-reduce-motion attributes, status-bar theme colour)
+    useRouter.js              history-API router: push/replace navigation, popstate, scroll restoration
   utils/
     storage.js                localStorage read/write, default progress shape, safe merge-on-load
+    settings.js               preference storage: defaults, merge-on-load, theme option list, theme colours
+    routes.js                 URL <-> view mapping (parseLocation / formatView / sectionView)
+    sound.js                  synthesised WebAudio blips for correct / wrong / streak milestone
     quiz.js                   pickRandom, buildMultipleChoiceOptions - generic over a `keyFn`
     conjugate.js              the conjugation engine: POLITE_LABELS, PLAIN_LABELS, conjugate(verb)
     romaji.js                 forgiving romaji matching (shi/si, tsu/tu, chi/ti, fu/hu, ja/zya, wo/o, ...)
@@ -129,6 +153,54 @@ One JSON blob in `localStorage` under `kana-quest-progress-v1`:
 
 `utils/storage.js` merges saved data onto fresh defaults **section-by-section and field-by-field** (not a shallow top-level spread), so adding a new progress field later doesn't wipe itself back to `undefined` for existing users — that's how `readingGame` and `conjugation` were added without migrations. Keep that pattern, and keep new mastery data SRS-ready (Stage 9 must pick it up without a migration).
 
+### Routing & navigation
+
+Every screen is addressable, so the phone's back button walks back through the app instead of exiting it:
+
+```
+/                              home dashboard
+/settings                      settings screen
+/hiragana                      a section in its default Learn mode
+/kanji/quiz?tier=2             a section mode, with its tab state in the query
+/verbs/conjugation?tier=1&style=plain
+```
+
+`utils/routes.js` is the pure URL↔view mapping (`parseLocation`, `formatView`, `sectionView`); `hooks/useRouter.js` owns the history API. The rules:
+
+- **Screen and mode changes push** a history entry (home → section → Flashcard Quiz → back → Learn)
+- **Refinement tabs replace** it (tier, polite/plain, kanji/kana) so back isn't clogged with them — `navigate(view, { replace: true })`
+- `SectionPage` holds **no tab state of its own** — mode/tier/style/script come in as `view` props and go out through `onChange`. A new tab dimension means adding it to `routes.js` first
+- Anything unparseable resolves to the `notfound` screen (a card with a way home), never a throw
+- Scroll position is stashed on the entry being left and restored on `popstate`, with `history.scrollRestoration = 'manual'` — coming back to a long grid lands where you were
+- Deep links need the host to serve `index.html` for unknown paths: that's what `vercel.json`'s rewrite does (and what the service worker does offline)
+
+### Settings & preferences
+
+A second localStorage blob, `kana-quest-settings-v1`, kept separate from progress and merged onto defaults the same field-by-field way:
+
+```js
+{ theme: 'system' | 'light' | 'dark',
+  reduceMotion: false,
+  sound: true,
+  quiz: { answerMode: 'choice' | 'type', verbScript: 'char' | 'kana' },
+  installHintDismissed: false }
+```
+
+`useSettings` applies them as side effects rather than prop-drilling: `data-theme` and `data-reduce-motion` on `<html>` (the CSS does the rest) plus the `<meta name="theme-color">` tint. `index.html` runs a tiny inline script that reads the same key before first paint, so a dark-theme user never sees a flash of cream — **if the storage key or theme shape changes, that script has to change with it.**
+
+Settings → About shows the version from `package.json`, injected as the `__APP_VERSION__` define in `vite.config.js` — bump `version` when a stage ships (Stage 6.5 set it to `0.6.5`).
+
+Preferences are defaults, not locks: `quiz.answerMode` seeds a quiz's input toggle and `quiz.verbScript` fills in the kanji/kana tab when the URL doesn't name one, but either can still be switched in the moment. Sound is synthesised in `utils/sound.js` (WebAudio, no audio files to ship or cache) and every call site gates on `settings.sound`.
+
+### PWA & offline
+
+- **Manifest** (`public/manifest.webmanifest`): standalone display, cream theme, the icon set, and shortcuts straight into each section (`/hiragana`, `/kanji`, …)
+- **Icons**: `public/icons/icon.svg` is the source of truth (and the favicon). `node scripts/generate-icons.mjs` re-rasterises the PNGs — any/maskable at 192 and 512, plus the 180px apple-touch icon — with Playwright's Chromium. Regenerate and commit them whenever the artwork changes
+- **Service worker**: `scripts/service-worker.js` is a plain-JS template; `scripts/vite-plugin-service-worker.js` stamps in the build's hashed asset list and a cache name derived from it, then emits `dist/sw.js`. A changed build ⇒ a new cache name ⇒ old caches dropped on activate. Build-only, so `npm run dev` stays cache-free
+- **What's precached**: the app shell, every JS/CSS chunk, the woff2 fonts, the manifest and the icons. Deliberately *not* precached: source maps, the woff twins of the woff2 fonts, and the mascot art — those fall to the runtime cache on first use. Fonts are imported as **latin subsets only** (`@fontsource/nunito/latin-400.css`), since the Japanese glyphs come from the system font and the other subsets would be dead weight in the cache
+- **Navigations** are served cache-first from the shell, so a deep link opened offline still boots. The shell is cached by hand (not via `addAll`) because a host that redirects `/index.html` → `/` returns a response flagged as redirected, and handing one of those to a navigation throws
+- **Install hint**: `InstallPrompt` shows only where `beforeinstallprompt` fires, and remembers its dismissal in settings
+
 ### Adding a whole new section
 
 1. Add a data file under `data/` in a compatible shape.
@@ -143,7 +215,18 @@ To add a kanji or verb tier: add the export, an entry in `...Tiers` and `...Tier
 
 Playful and cartoon-friendly — approachable for kids, still good for adults. Sakura pink / indigo / warm cream / red palette. Rounded shapes, bouncy micro-animations. Characters are the hero of every card.
 
-All shared visual primitives — `.btn`, `.card-surface`, `.pill-tabs`/`.pill-tab`, the `pop-in` / `wiggle` / `correct-bounce` / `flame-flicker` keyframes, and the colour, radius and shadow CSS variables — live in `src/index.css`. The palette is defined once as custom properties on `:root`; component CSS reuses those rather than redefining colours or shadows.
+All shared visual primitives — `.btn` (+ `-sakura`/`-outline`/`-danger`), `.icon-btn`, `.back-btn`, `.card-surface`, `.pill-tabs`/`.pill-tab`, `.skeleton`, the `pop-in` / `wiggle` / `correct-bounce` / `flame-flicker` / `view-in` / `pane-in` / `slide-up` / `shimmer` keyframes, and the colour, radius and shadow CSS variables — live in `src/index.css`. Component CSS reuses those rather than redefining colours or shadows.
+
+**Hue tokens vs. role tokens.** `:root` defines both: hue tokens (`--color-sakura`, `--color-indigo`, `--color-gold` …) keep their value in every theme, while role tokens are what components should actually reach for — `--color-surface`, `--color-surface-alt`, `--color-ink`, `--color-heading`, `--color-text-muted`, `--color-text-faint`, `--color-border`, `--color-border-soft`, `--color-on-accent` (text on an accent fill, always white), `--color-accent-text` (indigo as *text*, lightened in dark), `--color-success-soft`, `--color-danger-soft`, `--color-page-top`/`--color-page-bottom`. The `:root[data-theme='dark']` block re-points **only the role tokens**, so anything written in roles is themed for free. Adding a hardcoded hex to a component stylesheet is the one thing that breaks dark mode.
+
+**Depth (Stage 6.5).** Cards get `--shadow-card`: a 1px light top edge (`inset 0 1px 0 var(--edge-highlight)`, light catching the edge) + a solid stacked shadow for the cartoon cut-out look + a soft ambient one; `--shadow-card-hover` and `--shadow-card-press` are the lifted and pressed variants. Rules of the depth pass:
+
+- **Every tappable thing has a pressed state** — a small scale-down plus a tightened shadow, on `:active`
+- **Hover lift is desktop-only**, inside `@media (hover: hover) and (pointer: fine)` — on touch a hover style just sticks
+- `--ease-spring` (`cubic-bezier(0.34, 1.56, 0.64, 1)`) is the house easing for anything that should feel springy
+- Screen changes animate via `.view-swap` (keyed on the route in `App.jsx`), tab changes via `.section-pane` (keyed on mode/tier/style/script) — fast, never sluggish
+- `.skeleton` + `Skeleton.jsx` cover anything that takes a moment (today: the lazily-loaded section and settings chunks)
+- **Motion is opt-out**: both `@media (prefers-reduced-motion: reduce)` and the Settings toggle (`:root[data-reduce-motion='true']`) collapse animation and transition durations
 
 ---
 
@@ -164,6 +247,9 @@ They react after quizzes, celebrate streaks and milestones, and idle on the home
 - Every stage ends with: test → commit → push (Vercel auto-deploys) → update this handbook
 - **This handbook is the single source of truth for project state.** `CLAUDE.md` deliberately stays short (build commands + conventions) and points here; put project detail here, not there
 - Data lives in dedicated data files, structured so new content (verbs, decks, tiers) can be added by dropping in a file
+- Screens are addressable: a new screen or tab dimension goes into `utils/routes.js` first, so the back button keeps working
+- Component CSS uses **role tokens**, never raw hex — that's what keeps light and dark themes in step
+- Preferences belong in `utils/settings.js` (defaults + merge-on-load), progress in `utils/storage.js`; never mix the two blobs
 - All progress structures should be SRS-ready — mastery data must survive the SRS stage without migration pain
 - Never invent Japanese data. Readings, conjugations and meanings must be accurate; irregulars hardcoded, not generated
 - Errors and empty states always offer a way forward, never a dead end
@@ -180,8 +266,8 @@ They react after quizzes, celebrate streaks and milestones, and idle on the home
 | 4 | Kanji tab, 4 tiers | ✅ Done |
 | 5 | Polish & gamification, dashboard, streaks | ✅ Done |
 | 6 | Verbs tab — 3 tiers, polite/plain conjugations, conjugation quiz | ✅ Done |
-| 6.5 | Feel & flow — PWA, depth pass, navigation, settings, this handbook | ⬜ Next |
-| 7 | Radicals system | ⬜ |
+| 6.5 | Feel & flow — installable PWA + offline, depth/press/motion pass, dark theme, history-API navigation, settings screen | ✅ Done |
+| 7 | Radicals system | ⬜ Next |
 | 8 | Mnemonics & stories | ⬜ |
 | 9 | Spaced repetition (SRS) | ⬜ |
 | 10 | Font trainer | ⬜ |

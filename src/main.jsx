@@ -8,3 +8,13 @@ createRoot(document.getElementById('root')).render(
     <App />
   </StrictMode>,
 )
+
+// The worker is only emitted by `vite build` (see scripts/vite-plugin-service-worker.js),
+// so dev keeps its normal, cache-free reload behaviour.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/sw.js')
+      .catch((err) => console.warn('Service worker registration failed.', err))
+  })
+}

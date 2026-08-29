@@ -1,8 +1,10 @@
 import { useRef, useState } from 'react'
 import { useProgressContext } from '../context/ProgressContext'
+import { useSettingsContext } from '../context/SettingsContext'
 import { buildMultipleChoiceOptions, pickRandom } from '../utils/quiz'
 import { isRomajiMatch } from '../utils/romaji'
 import { randomCorrectMessage, randomWrongMessage } from '../utils/messages'
+import { playSound } from '../utils/sound'
 import StreakStat from './StreakStat'
 import Celebration from './Celebration'
 import './FlashcardQuiz.css'
@@ -26,7 +28,9 @@ function isAnswerMatch(input, targetKey, correctValue) {
 
 export default function FlashcardQuiz({ section, characters, answerModes = DEFAULT_ANSWER_MODES, promptKey = 'char' }) {
   const { recordQuizAnswer } = useProgressContext()
-  const [answerMode, setAnswerMode] = useState('choice') // 'choice' | 'type'
+  const { settings } = useSettingsContext()
+  // Seeded from the saved preference; switching it here is just for this session.
+  const [answerMode, setAnswerMode] = useState(settings.quiz.answerMode) // 'choice' | 'type'
   const [target, setTarget] = useState(answerModes[0].key)
   const [current, setCurrent] = useState(() => pickRandom(characters))
   const [options, setOptions] = useState(() =>
@@ -80,7 +84,9 @@ export default function FlashcardQuiz({ section, characters, answerModes = DEFAU
     setBestStreak((b) => Math.max(b, newStreak))
     if (isCorrect) setScore((s) => s + 1)
     recordQuizAnswer(section, isCorrect, newStreak)
-    if (isCorrect && newStreak > 0 && newStreak % STREAK_MILESTONE === 0) {
+    const milestone = isCorrect && newStreak > 0 && newStreak % STREAK_MILESTONE === 0
+    if (settings.sound) playSound(milestone ? 'celebrate' : isCorrect ? 'correct' : 'wrong')
+    if (milestone) {
       triggerCelebration(`🔥 ${newStreak} in a row!`)
     }
   }

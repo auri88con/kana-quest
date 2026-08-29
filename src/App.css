@@ -10,5 +10,33 @@
   max-width: 960px;
   margin: 0 auto;
   padding: 1.5rem 1.25rem 3rem;
+  padding-bottom: calc(3rem + env(safe-area-inset-bottom));
   box-sizing: border-box;
+}
+
+/* Screen-level transition: keyed on the route in App.jsx, so every arrival
+   fades and springs up rather than snapping in. */
+.view-swap {
+  animation: view-in 0.26s var(--ease-spring) both;
+}
+
+.not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 3rem 2rem;
+  margin: 0 auto;
+  text-align: center;
+  border: 3px dashed var(--color-border-soft);
+  max-width: 480px;
+}
+
+.not-found-emoji {
+  font-size: 3rem;
+}
+
+.not-found p {
+  color: var(--color-text-muted);
+  margin-bottom: 0.6rem;
 }

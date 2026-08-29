@@ -23,7 +23,7 @@
 .row-section-label {
   font-family: var(--font-display);
   font-size: 0.95rem;
-  color: var(--color-indigo);
+  color: var(--color-accent-text);
   text-align: left;
   margin-bottom: 0.5rem;
   opacity: 0.85;

@@ -16,7 +16,7 @@
 
 .home-hero-sub {
   margin-top: 0.4rem;
-  color: var(--color-indigo);
+  color: var(--color-accent-text);
   font-weight: 600;
 }
 
@@ -24,7 +24,7 @@
   width: 100%;
   max-width: 640px;
   padding: 1.5rem;
-  border: 3px solid var(--color-sakura-light);
+  border: 3px solid var(--color-border-soft);
 }
 
 .dashboard h2 {
@@ -44,7 +44,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.15rem;
-  background: var(--color-cream-deep);
+  background: var(--color-surface-alt);
   border-radius: var(--radius-md);
   padding: 0.85rem 0.5rem;
 }
@@ -53,18 +53,18 @@
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 1.5rem;
-  color: var(--color-indigo-deep);
+  color: var(--color-heading);
 }
 
 .stat-of {
   font-size: 1rem;
   font-weight: 700;
-  color: #a49bb0;
+  color: var(--color-text-faint);
 }
 
 .stat-label {
   font-size: 0.75rem;
-  color: #8b8397;
+  color: var(--color-text-muted);
   font-weight: 600;
   text-align: center;
 }
@@ -83,15 +83,22 @@
   align-items: center;
   gap: 0.4rem;
   padding: 1.75rem 1.25rem;
-  border: 3px solid var(--color-indigo-light);
-  background: var(--color-white);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  border: 3px solid var(--color-border);
+  background: var(--color-surface);
+  transition: transform 0.15s var(--ease-spring), box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
-.section-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-card-hover);
-  border-color: var(--color-sakura);
+.section-card:active {
+  transform: translateY(2px) scale(0.985);
+  box-shadow: var(--shadow-card-press);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .section-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-card-hover);
+    border-color: var(--color-sakura);
+  }
 }
 
 .section-card-emoji {
@@ -106,7 +113,7 @@
 
 .section-card-tagline {
   font-size: 0.85rem;
-  color: #8b8397;
+  color: var(--color-text-muted);
   text-align: center;
 }
 
@@ -122,7 +129,7 @@
 .progress-bar {
   width: 100%;
   height: 10px;
-  background: var(--color-cream-deep);
+  background: var(--color-surface-alt);
   border-radius: var(--radius-pill);
   overflow: hidden;
 }
@@ -137,7 +144,7 @@
 .section-card-progress-label {
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--color-indigo);
+  color: var(--color-accent-text);
 }
 
 .section-card-stats {
@@ -153,8 +160,8 @@
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.75rem;
-  background: var(--color-cream-deep);
-  color: var(--color-indigo-deep);
+  background: var(--color-surface-alt);
+  color: var(--color-heading);
   padding: 0.3rem 0.55rem;
   border-radius: var(--radius-pill);
 }
@@ -169,7 +176,7 @@
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--color-red);
-  background: #fdeceb;
+  background: var(--color-danger-soft);
   padding: 0.25rem 0.7rem;
   border-radius: var(--radius-pill);
 }

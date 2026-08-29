@@ -27,7 +27,7 @@
 .verb-card-furigana {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--color-indigo);
+  color: var(--color-accent-text);
 }
 
 .verb-conjugation-table {
@@ -60,13 +60,13 @@
 }
 
 .verb-form-kana {
-  color: var(--color-indigo-deep);
+  color: var(--color-heading);
   font-size: 0.8rem;
   margin-right: 0.35rem;
 }
 
 .verb-form-romaji {
-  color: #8b8397;
+  color: var(--color-text-muted);
   font-size: 0.75rem;
   font-style: italic;
 }

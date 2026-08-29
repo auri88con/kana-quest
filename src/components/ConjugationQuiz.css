@@ -1,6 +1,6 @@
 .conjugation-quiz-meaning {
   font-size: 0.95rem;
-  color: #8b8397;
+  color: var(--color-text-muted);
   font-style: italic;
   margin-top: -0.5rem;
 }

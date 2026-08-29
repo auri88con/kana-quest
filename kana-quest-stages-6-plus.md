@@ -2,7 +2,9 @@
 
 Stages 1–5 are already built and live. Paste each stage below into Claude Code one at a time, in order. Wait for a stage to be complete, tested, committed, and pushed before pasting the next.
 
-Reminder for every stage: commit and push to the **kana-quest** repo with a clear message when done (Vercel auto-deploys), and update **KANA_HANDBOOK.md** whenever a stage adds a new system. The handbook is the single source of truth for project state; CLAUDE.md just points to it.
+Reminder for every stage: test, then commit and push to the **kana-quest** repo with a clear message when done (Vercel auto-deploys), then update **KANA_HANDBOOK.md**.
+
+**`KANA_HANDBOOK.md` is the single source of truth for project state, and the only doc a stage updates.** Every stage ends by writing what it added into the handbook — architecture, new systems, data shapes, conventions, and the stage-history table. `CLAUDE.md` deliberately stays short (build commands + conventions) and just points at the handbook: do not move project detail into it, and do not treat it as the place to record what a stage did. This stages doc is the brief for what to build; the handbook is the record of what exists.
 
 ---
 

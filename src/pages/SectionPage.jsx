@@ -1,10 +1,10 @@
-import { useState } from 'react'
 import CharacterBrowser from '../components/CharacterBrowser'
 import KanjiBrowser from '../components/KanjiBrowser'
 import VerbBrowser from '../components/VerbBrowser'
 import FlashcardQuiz from '../components/FlashcardQuiz'
 import ReadingGame from '../components/ReadingGame'
 import ConjugationQuiz from '../components/ConjugationQuiz'
+import { useSettingsContext } from '../context/SettingsContext'
 import { readingGameWords } from '../data/readingGame'
 import {
   hiraganaAllCharacters,
@@ -71,12 +71,16 @@ const SECTION_CONFIG = {
   },
 }
 
-export default function SectionPage({ section, onBack }) {
-  const [mode, setMode] = useState('learn')
-  const [tier, setTier] = useState(1)
-  const [style, setStyle] = useState('polite') // verbs only: 'polite' | 'plain'
-  const [script, setScript] = useState('char') // verbs only: 'char' | 'kana'
-  const config = SECTION_CONFIG[section]
+// Mode/tier/style/script all live in the URL (see utils/routes.js) so the back
+// button walks back through them. Mode changes push a history entry; the
+// refinement tabs replace the current one.
+export default function SectionPage({ view, onChange, onBack }) {
+  const { settings } = useSettingsContext()
+  const config = SECTION_CONFIG[view.section]
+  const mode = view.mode
+  const style = view.style
+  const script = view.script ?? settings.quiz.verbScript
+  const tier = config.tiers && !config.tiers[view.tier] ? 1 : view.tier
 
   if (!config.ready) {
     return (
@@ -93,6 +97,8 @@ export default function SectionPage({ section, onBack }) {
     )
   }
 
+  const tierCharacters = config.tiers ? config.tiers[tier] : config.characters
+
   return (
     <div className="section-page">
       <div className="section-page-top">
@@ -106,21 +112,21 @@ export default function SectionPage({ section, onBack }) {
         <button
           type="button"
           className={`pill-tab ${mode === 'learn' ? 'is-active' : ''}`}
-          onClick={() => setMode('learn')}
+          onClick={() => onChange({ mode: 'learn' })}
         >
           📖 Learn
         </button>
         <button
           type="button"
           className={`pill-tab ${mode === 'quiz' ? 'is-active' : ''}`}
-          onClick={() => setMode('quiz')}
+          onClick={() => onChange({ mode: 'quiz' })}
         >
           🎯 Flashcard Quiz
         </button>
         <button
           type="button"
           className={`pill-tab ${mode === 'reading' ? 'is-active' : ''}`}
-          onClick={() => setMode('reading')}
+          onClick={() => onChange({ mode: 'reading' })}
         >
           📝 Reading Game
         </button>
@@ -128,7 +134,7 @@ export default function SectionPage({ section, onBack }) {
           <button
             type="button"
             className={`pill-tab ${mode === 'conjugation' ? 'is-active' : ''}`}
-            onClick={() => setMode('conjugation')}
+            onClick={() => onChange({ mode: 'conjugation' })}
           >
             🔤 Conjugation Quiz
           </button>
@@ -142,7 +148,7 @@ export default function SectionPage({ section, onBack }) {
               key={tierKey}
               type="button"
               className={`pill-tab ${tier === Number(tierKey) ? 'is-active' : ''}`}
-              onClick={() => setTier(Number(tierKey))}
+              onClick={() => onChange({ tier: Number(tierKey) }, { replace: true })}
               title={meta.sublabel}
             >
               {meta.label}
@@ -156,14 +162,14 @@ export default function SectionPage({ section, onBack }) {
           <button
             type="button"
             className={`pill-tab ${style === 'polite' ? 'is-active' : ''}`}
-            onClick={() => setStyle('polite')}
+            onClick={() => onChange({ style: 'polite' }, { replace: true })}
           >
             Polite (です・ます)
           </button>
           <button
             type="button"
             className={`pill-tab ${style === 'plain' ? 'is-active' : ''}`}
-            onClick={() => setStyle('plain')}
+            onClick={() => onChange({ style: 'plain' }, { replace: true })}
           >
             Plain (casual)
           </button>
@@ -175,58 +181,60 @@ export default function SectionPage({ section, onBack }) {
           <button
             type="button"
             className={`pill-tab ${script === 'char' ? 'is-active' : ''}`}
-            onClick={() => setScript('char')}
+            onClick={() => onChange({ script: 'char' }, { replace: true })}
           >
             漢字
           </button>
           <button
             type="button"
             className={`pill-tab ${script === 'kana' ? 'is-active' : ''}`}
-            onClick={() => setScript('kana')}
+            onClick={() => onChange({ script: 'kana' }, { replace: true })}
           >
             かな
           </button>
         </div>
       )}
 
-      {mode === 'learn' && config.isVerbs && (
-        <VerbBrowser section={section} characters={config.tiers[tier]} style={style} />
-      )}
+      {/* Keyed so switching any tab replays the pane's entrance animation and
+          quiz components remount with a fresh question set. */}
+      <div className="section-pane" key={`${mode}:${tier}:${style}:${script}`}>
+        {mode === 'learn' && config.isVerbs && (
+          <VerbBrowser section={view.section} characters={tierCharacters} style={style} />
+        )}
 
-      {mode === 'learn' && config.isKanji && (
-        <KanjiBrowser section={section} characters={config.tiers[tier]} />
-      )}
+        {mode === 'learn' && config.isKanji && <KanjiBrowser section={view.section} characters={tierCharacters} />}
 
-      {mode === 'learn' && !config.isVerbs && !config.isKanji && (
-        <CharacterBrowser
-          section={section}
-          rowGroups={config.rowGroups}
-          dakuonGroups={config.dakuonGroups}
-          handakuonGroups={config.handakuonGroups}
-          yoonGroups={config.yoonGroups}
-        />
-      )}
+        {mode === 'learn' && !config.isVerbs && !config.isKanji && (
+          <CharacterBrowser
+            section={view.section}
+            rowGroups={config.rowGroups}
+            dakuonGroups={config.dakuonGroups}
+            handakuonGroups={config.handakuonGroups}
+            yoonGroups={config.yoonGroups}
+          />
+        )}
 
-      {mode === 'quiz' && config.isVerbs && (
-        <FlashcardQuiz
-          section={section}
-          characters={config.tiers[tier]}
-          answerModes={VERB_ANSWER_MODES}
-          promptKey={script}
-        />
-      )}
+        {mode === 'quiz' && config.isVerbs && (
+          <FlashcardQuiz
+            section={view.section}
+            characters={tierCharacters}
+            answerModes={VERB_ANSWER_MODES}
+            promptKey={script}
+          />
+        )}
 
-      {mode === 'quiz' && config.isKanji && (
-        <FlashcardQuiz section={section} characters={config.tiers[tier]} answerModes={KANJI_ANSWER_MODES} />
-      )}
+        {mode === 'quiz' && config.isKanji && (
+          <FlashcardQuiz section={view.section} characters={tierCharacters} answerModes={KANJI_ANSWER_MODES} />
+        )}
 
-      {mode === 'quiz' && !config.isVerbs && !config.isKanji && (
-        <FlashcardQuiz section={section} characters={config.characters} />
-      )}
+        {mode === 'quiz' && !config.isVerbs && !config.isKanji && (
+          <FlashcardQuiz section={view.section} characters={config.characters} />
+        )}
 
-      {mode === 'reading' && <ReadingGame section={section} wordsByLevel={readingGameWords[section]} />}
+        {mode === 'reading' && <ReadingGame section={view.section} wordsByLevel={readingGameWords[view.section]} />}
 
-      {mode === 'conjugation' && config.isVerbs && <ConjugationQuiz verbs={config.tiers[tier]} style={style} />}
+        {mode === 'conjugation' && config.isVerbs && <ConjugationQuiz verbs={tierCharacters} style={style} />}
+      </div>
     </div>
   )
 }

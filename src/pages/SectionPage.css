@@ -17,13 +17,6 @@
   font-size: 1.6rem;
 }
 
-.back-btn {
-  position: absolute;
-  left: 0;
-  font-size: 0.85rem;
-  padding: 0.5rem 1rem;
-}
-
 .mode-tabs {
   justify-content: center;
 }
@@ -35,6 +28,15 @@
 .style-tabs,
 .script-tabs {
   justify-content: center;
+}
+
+/* Every tab switch swaps this pane, so it gets its own quick entrance. */
+.section-pane {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: pane-in 0.22s var(--ease-spring) both;
 }
 
 .pill-tab.is-disabled {
@@ -49,7 +51,7 @@
   gap: 0.5rem;
   padding: 3rem 2rem;
   text-align: center;
-  border: 3px dashed var(--color-sakura-light);
+  border: 3px dashed var(--color-border-soft);
   max-width: 480px;
 }
 
@@ -58,7 +60,7 @@
 }
 
 .coming-soon p {
-  color: #8b8397;
+  color: var(--color-text-muted);
 }
 
 @media (max-width: 480px) {

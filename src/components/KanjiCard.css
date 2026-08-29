@@ -2,6 +2,6 @@
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.85rem;
-  color: var(--color-indigo);
+  color: var(--color-accent-text);
   text-transform: capitalize;
 }

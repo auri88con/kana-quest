@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { useProgressContext } from '../context/ProgressContext'
+import { useSettingsContext } from '../context/SettingsContext'
 import { pickRandom } from '../utils/quiz'
 import { isRomajiMatch } from '../utils/romaji'
 import { randomCorrectMessage, randomWrongMessage } from '../utils/messages'
+import { playSound } from '../utils/sound'
 import { READING_GAME_LEVELS, READING_GAME_UNLOCK_THRESHOLD } from '../data/readingGame'
 import StreakStat from './StreakStat'
 import Celebration from './Celebration'
@@ -14,6 +16,7 @@ const CELEBRATION_DURATION_MS = 2600
 
 export default function ReadingGame({ section, wordsByLevel }) {
   const { progress, recordReadingAnswer } = useProgressContext()
+  const { settings } = useSettingsContext()
   const readingProgress = progress[section].readingGame
   const unlockedLevel = readingProgress.unlockedLevel
 
@@ -69,7 +72,9 @@ export default function ReadingGame({ section, wordsByLevel }) {
     setBestSessionStreak((b) => Math.max(b, newStreak))
     if (isCorrect) setScore((s) => s + 1)
     recordReadingAnswer(section, level, isCorrect, newStreak)
-    if (isCorrect && newStreak > 0 && newStreak % STREAK_MILESTONE === 0) {
+    const milestone = isCorrect && newStreak > 0 && newStreak % STREAK_MILESTONE === 0
+    if (settings.sound) playSound(milestone ? 'celebrate' : isCorrect ? 'correct' : 'wrong')
+    if (milestone) {
       triggerCelebration(`🔥 ${newStreak} in a row!`)
     }
   }

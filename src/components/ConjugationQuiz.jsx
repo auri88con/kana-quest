@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useProgressContext } from '../context/ProgressContext'
+import { useSettingsContext } from '../context/SettingsContext'
 import { buildMultipleChoiceOptions, pickRandom } from '../utils/quiz'
 import { isRomajiMatch } from '../utils/romaji'
 import { randomCorrectMessage, randomWrongMessage } from '../utils/messages'
 import { conjugate } from '../utils/conjugate'
+import { playSound } from '../utils/sound'
 import StreakStat from './StreakStat'
 import Celebration from './Celebration'
 import './FlashcardQuiz.css'
@@ -22,7 +24,8 @@ function askableForms(verb, style) {
 
 export default function ConjugationQuiz({ verbs, style }) {
   const { recordConjugationAnswer } = useProgressContext()
-  const [answerMode, setAnswerMode] = useState('choice') // 'choice' | 'type'
+  const { settings } = useSettingsContext()
+  const [answerMode, setAnswerMode] = useState(settings.quiz.answerMode) // 'choice' | 'type'
   const [current, setCurrent] = useState(() => pickRandom(verbs))
   const [targetForm, setTargetForm] = useState(() => pickRandom(askableForms(current, style)))
   const [options, setOptions] = useState(() =>
@@ -55,14 +58,6 @@ export default function ConjugationQuiz({ verbs, style }) {
     setSelected(null)
   }
 
-  // Style (Polite/Plain) is switched from a pill tab outside this component —
-  // when it changes mid-quiz, re-roll against the new form set rather than
-  // asking a question that no longer matches the active style tab.
-  useEffect(() => {
-    refreshQuestion(current, style)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [style])
-
   function nextQuestion() {
     refreshQuestion(pickRandom(verbs, current, (v) => v.char), style)
   }
@@ -77,7 +72,9 @@ export default function ConjugationQuiz({ verbs, style }) {
     setBestStreak((b) => Math.max(b, newStreak))
     if (isCorrect) setScore((s) => s + 1)
     recordConjugationAnswer(style, current.char, isCorrect, newStreak)
-    if (isCorrect && newStreak > 0 && newStreak % STREAK_MILESTONE === 0) {
+    const milestone = isCorrect && newStreak > 0 && newStreak % STREAK_MILESTONE === 0
+    if (settings.sound) playSound(milestone ? 'celebrate' : isCorrect ? 'correct' : 'wrong')
+    if (milestone) {
       triggerCelebration(`🔥 ${newStreak} in a row!`)
     }
   }

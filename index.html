@@ -2,10 +2,41 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎌</text></svg>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Kana Quest — a playful, game-style app for learning to read hiragana, katakana, and kanji." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Kana Quest</title>
+    <meta name="description" content="Kana Quest — a playful, game-style app for learning to read hiragana, katakana, kanji and Japanese verbs." />
+
+    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- Status/title bar tint. The dark value is also swapped at runtime when the
+         theme setting changes (see src/hooks/useSettings.js). -->
+    <meta name="theme-color" content="#fffaf0" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#221f33" media="(prefers-color-scheme: dark)" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Kana Quest" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <script>
+      // Apply the saved theme before first paint, so a dark-theme user never
+      // gets a flash of cream. Mirrors useSettings — keep the key in sync with
+      // src/utils/settings.js.
+      try {
+        var saved = JSON.parse(localStorage.getItem('kana-quest-settings-v1') || '{}')
+        var theme =
+          saved.theme === 'light' || saved.theme === 'dark'
+            ? saved.theme
+            : window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light'
+        document.documentElement.dataset.theme = theme
+        document.documentElement.style.colorScheme = theme
+        if (saved.reduceMotion) document.documentElement.dataset.reduceMotion = 'true'
+      } catch (err) {
+        /* first run, or storage blocked — the app applies the theme on mount */
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
