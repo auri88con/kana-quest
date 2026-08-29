@@ -57,6 +57,11 @@ export default function App() {
       isFirstRender.current = false
       return
     }
+    // Unless the screen has already placed focus somewhere more useful — the
+    // radical you arrived at from a kanji's breakdown, say. Pulling it back to
+    // the top of <main> would undo that.
+    const active = document.activeElement
+    if (active !== mainRef.current && mainRef.current?.contains(active)) return
     mainRef.current?.focus()
   }, [screenKey, view.mode])
 

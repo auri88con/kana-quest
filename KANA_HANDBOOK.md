@@ -76,7 +76,8 @@ src/
     CharacterCard.jsx         one card: character, romaji, emoji, example word
     KanjiBrowser.jsx          Learn-mode grid for Kanji (flat grid per tier)
     KanjiCard.jsx             like CharacterCard but adds a meaning line and, where the data has one,
-                              a "built from" / "contains" radical breakdown
+                              a "built from" / "contains" radical breakdown;
+                              one composite keyboard stop (Tab between cards, arrows within one)
     RadicalBrowser.jsx        Radicals-mode grid: the learn-these-first panel + the six radical groups
     RadicalCard.jsx           one radical: shape, stroke count, variants, name/nickname, and the kanji it appears in
     VerbBrowser.jsx           Learn-mode grid for Verbs (flat grid per tier)
@@ -158,7 +159,8 @@ and `radicalByAnyForm` (canonical form *and* variants → the entry, so a compon
 match), `meaning` describes what the shape depicts. Every entry is a genuine Kangxi radical. `utils/radicals.js`
 derives the reverse index (which kanji use a radical) rather than storing it, so the two files cannot drift apart.
 `npm run check:radicals` fails if a kanji names a radical that is not in the set, if `partial` appears without
-components, or if two radicals claim the same glyph.
+components, or if two radicals claim the same glyph. It runs as part of `npm run build`, so bad data fails the
+build and the deploy rather than shipping.
 
 **`data/verbs.js`** — `verbTier1`–`verbTier3`, plus `verbTiers`, `verbTierMeta` and `verbAllCharacters`:
 
@@ -222,7 +224,8 @@ Every screen is addressable, so the phone's back button walks back through the a
 - Scroll position is stashed on the entry being left and restored on `popstate`, with `history.scrollRestoration = 'manual'` — coming back to a long grid lands where you were
 - Deep links need the host to serve `index.html` for unknown paths: that's what `vercel.json`'s rewrite does (and what the service worker does offline). The rewrite deliberately **excludes** `assets/`, `icons/`, `mascots/`, `sw.js` and the manifest — a missing asset must 404 honestly, because an SPA fallback answering a script request with HTML at 200 is exactly the thing that poisons the offline cache
 - Navigating to the URL you are already on is a no-op, so re-tapping the active tab can't stack entries that make Back look broken
-- After each navigation the main region takes focus and a visually-hidden live region announces the screen ("Kanji, Learn"), so the app is usable without a mouse or eyes
+- After each navigation the main region takes focus and a visually-hidden live region announces the screen ("Kanji, Learn"), so the app is usable without a mouse or eyes — unless the screen has already placed focus itself (arriving at a radical from a kanji breakdown focuses that card), which App leaves alone
+- `/kanji/radicals?focus=木` is a real, validated route: it scrolls and focuses that radical, and the announcement names it ("Kanji, Radicals, 木 tree"). The scroll is queued in a `requestAnimationFrame` so it lands *after* the router's own scroll reset; the focus is a layout effect so it lands *before* App's focus effect looks
 
 ### Settings & preferences
 

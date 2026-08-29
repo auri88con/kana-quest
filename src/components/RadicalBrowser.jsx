@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import RadicalCard from './RadicalCard'
 import { useProgressContext } from '../context/ProgressContext'
 import { radicals, radicalsByGroup } from '../data/radicals'
@@ -18,6 +18,18 @@ export default function RadicalBrowser({ onOpenLearn, focusChar }) {
   // scroll twice — once in its layout effect and once in a requestAnimationFrame
   // after it — and this passive effect lands between the two. Queueing our own
   // frame puts the scroll after the router's, instead of racing it.
+  // Focus in a layout effect, which runs child-before-parent during the commit
+  // — so it is already placed by the time App's own post-navigation effect
+  // looks, and App leaves it alone rather than pulling focus back to <main>.
+  // The card is a button, so a screen reader reads out the radical you landed
+  // on, and the keyboard caret ends up where the eye is.
+  useLayoutEffect(() => {
+    if (focusChar) focusRef.current?.focus({ preventScroll: true })
+  }, [focusChar])
+
+  // The scroll, by contrast, has to come last: see the comment in useRouter —
+  // a push navigation resets the scroll in a layout effect and again in a
+  // requestAnimationFrame, so ours has to be queued behind that one.
   useEffect(() => {
     if (!focusChar) return undefined
     const frame = requestAnimationFrame(() => focusRef.current?.scrollIntoView({ block: 'center' }))

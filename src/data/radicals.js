@@ -47,7 +47,7 @@ export const radicals = [
   { char: '山', name: 'mountain', nickname: 'mountain', meaning: 'three peaks in a row', emoji: '⛰️', strokes: 3, variants: [], group: 'nature' },
   { char: '川', name: 'river', nickname: 'river', meaning: 'water running between two banks', emoji: '🏞️', strokes: 3, variants: [], group: 'nature' },
   { char: '石', name: 'stone', nickname: 'stone', meaning: 'a rock lying at the foot of a cliff', emoji: '🪨', strokes: 5, variants: [], group: 'nature' },
-  { char: '田', name: 'rice field', nickname: 'paddy field', meaning: 'a field seen from above, divided into plots', emoji: '🌾', strokes: 5, variants: [], group: 'nature' },
+  { char: '田', name: 'rice field', nickname: 'paddy field', meaning: 'a field seen from above, divided into plots', emoji: '🌱', strokes: 5, variants: [], group: 'nature' },
   { char: '雨', name: 'rain', nickname: 'rain', meaning: 'droplets falling from a cloud', emoji: '🌧️', strokes: 8, variants: [], group: 'nature' },
   { char: '夕', name: 'evening', nickname: 'dusk', meaning: 'the moon only half-risen — early evening', emoji: '🌆', strokes: 3, variants: [], group: 'nature' },
 
@@ -78,8 +78,8 @@ export const radicals = [
   { char: '貝', name: 'shell', nickname: 'shell money', meaning: 'a cowrie shell — the old currency, so it means money or value', emoji: '🐚', strokes: 7, variants: [], group: 'things' },
   { char: '金', name: 'metal', nickname: 'gold', meaning: 'nuggets of metal buried under the ground — gold, and money', emoji: '🪙', strokes: 8, variants: [], group: 'things' },
   { char: '罒', name: 'net', nickname: 'net', meaning: 'a net with its mesh — it sits on top of a kanji', emoji: '🕸️', strokes: 5, variants: [], group: 'things' },
-  { char: '示', name: 'altar', nickname: 'altar', meaning: 'an altar table — gods, ritual, and anything sacred', emoji: '⛩️', strokes: 5, variants: ['礻'], group: 'things' },
-  { char: '食', name: 'food', nickname: 'food', meaning: 'a lid over a bowl of rice', emoji: '🍚', strokes: 9, variants: ['飠'], group: 'things' },
+  { char: '示', name: 'altar', nickname: 'altar', meaning: 'an altar table — gods, ritual, and anything sacred', emoji: '🙏', strokes: 5, variants: ['礻'], group: 'things' },
+  { char: '食', name: 'food', nickname: 'food', meaning: 'a lid over a bowl of rice', emoji: '🍱', strokes: 9, variants: ['飠'], group: 'things' },
   { char: '王', name: 'jade', nickname: 'king', meaning: 'three jade discs threaded on a string — the radical is jade, though it is written exactly like the kanji for king', emoji: '👑', strokes: 4, variants: ['玉'], group: 'things' },
   { char: '斤', name: 'axe', nickname: 'axe', meaning: 'an axe head on its handle', emoji: '🪓', strokes: 4, variants: [], group: 'things' },
   { char: '寸', name: 'measure', nickname: 'thumb-width', meaning: 'a hand with a mark at the pulse — a small measure, or a careful action', emoji: '📏', strokes: 3, variants: [], group: 'things' },
@@ -98,7 +98,7 @@ export const radicals = [
   { char: '大', name: 'big', nickname: 'big', meaning: 'a person with their arms stretched as wide as they go', emoji: '🙆', strokes: 3, variants: [], group: 'strokes' },
   { char: '小', name: 'small', nickname: 'small', meaning: 'a thing split into ever smaller pieces', emoji: '🤏', strokes: 3, variants: [], group: 'strokes' },
   { char: '入', name: 'enter', nickname: 'enter', meaning: 'a mouth of a cave, or a path forking inward', emoji: '🚪', strokes: 2, variants: [], group: 'strokes' },
-  { char: '立', name: 'stand', nickname: 'standing', meaning: 'a person standing squarely on the ground', emoji: '🧍', strokes: 5, variants: [], group: 'strokes' },
+  { char: '立', name: 'stand', nickname: 'standing', meaning: 'a person standing squarely on the ground', emoji: '🕴️', strokes: 5, variants: [], group: 'strokes' },
   { char: '白', name: 'white', nickname: 'white', meaning: 'the sun just breaking the horizon — white, and bright', emoji: '⚪', strokes: 5, variants: [], group: 'strokes' },
 ]
 

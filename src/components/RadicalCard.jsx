@@ -50,7 +50,14 @@ export default function RadicalCard({ data, examples = [], focused = false, inne
       {shown.length > 0 && (
         <span className="radical-card-examples">
           <span className="radical-card-examples-label">appears in</span>
-          <span className="radical-card-examples-chars">{shown.join('　')}</span>
+          <span className="radical-card-examples-chars">
+            {shown.join('　')}
+            {/* Say so when the list is cut short, rather than quietly implying
+                this radical turns up in exactly five kanji. */}
+            {examples.length > shown.length && (
+              <span className="radical-card-examples-more">+{examples.length - shown.length}</span>
+            )}
+          </span>
         </span>
       )}
     </button>

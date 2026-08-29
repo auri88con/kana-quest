@@ -1,4 +1,4 @@
-import { Fragment } from 'react'
+import { Fragment, useRef, useState } from 'react'
 import { useProgressContext } from '../context/ProgressContext'
 import { componentsOf } from '../utils/radicals'
 import '../components/CharacterCard.css'
@@ -8,20 +8,46 @@ import './KanjiCard.css'
 // themselves buttons, and a button inside a button is invalid. The card body
 // carries the "mark it met" click; :hover and :active still reach .kana-card
 // from either child, so the lift and squish are unchanged.
+//
+// Keyboard: the card is one composite stop, not several. Tab moves card to card
+// (105 stops on the Tier 1 grid, as before the chips existed — putting every
+// chip in the tab order would have made it 190), and ←/→ walk the body and its
+// chips once you are on a card. That's the standard roving-tabindex pattern.
 export default function KanjiCard({ section, data, onOpenRadical }) {
   const { progress, markCharacterSeen } = useProgressContext()
   const seen = progress[section]?.seenCharacters.includes(data.char)
   // Only the kanji whose parts we can actually name carry a breakdown; the rest
   // render exactly as they did before.
   const parts = componentsOf(data)
+  const cardRef = useRef(null)
+  // Which stop within this card Tab lands on. Held in state rather than poked
+  // onto the DOM, so a re-render can't strand the card with nothing tabbable.
+  const [activeStop, setActiveStop] = useState(0)
+
+  function handleKeyDown(event) {
+    if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
+    const stops = [...cardRef.current.querySelectorAll('.kanji-card-body, .kanji-parts-chip')]
+    const index = stops.indexOf(document.activeElement)
+    if (index < 0) return
+    const next = index + (event.key === 'ArrowRight' ? 1 : -1)
+    if (next < 0 || next >= stops.length) return
+    event.preventDefault()
+    setActiveStop(next)
+    stops[next].focus()
+  }
 
   return (
-    <div className={`kana-card kanji-card ${seen ? 'is-seen' : ''}`}>
+    <div
+      ref={cardRef}
+      className={`kana-card kanji-card ${seen ? 'is-seen' : ''}`}
+      onKeyDown={parts.length > 0 ? handleKeyDown : undefined}
+    >
       {seen && <span className="kana-card-check" aria-hidden="true">✓</span>}
 
       <button
         type="button"
         className="kanji-card-body"
+        tabIndex={activeStop === 0 ? 0 : -1}
         onClick={() => markCharacterSeen(section, data.char)}
       >
         <span className="kana-card-char">{data.char}</span>
@@ -55,6 +81,7 @@ export default function KanjiCard({ section, data, onOpenRadical }) {
                 <button
                   type="button"
                   className="kanji-parts-chip"
+                  tabIndex={activeStop === i + 1 ? 0 : -1}
                   onClick={() => onOpenRadical?.(radical.char)}
                   title={`See ${radical.name} in Radicals`}
                 >

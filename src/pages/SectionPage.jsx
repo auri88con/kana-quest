@@ -188,7 +188,7 @@ export default function SectionPage({ view, onChange, onBack }) {
           <button
             type="button"
             className={`pill-tab ${radicalView === 'quiz' ? 'is-active' : ''}`}
-            onClick={() => onChange({ radicalView: 'quiz' }, { replace: true })}
+            onClick={() => onChange({ radicalView: 'quiz', focusRadical: null }, { replace: true })}
           >
             Quiz
           </button>
@@ -261,6 +261,7 @@ export default function SectionPage({ view, onChange, onBack }) {
             characters={radicals}
             answerModes={RADICAL_ANSWER_MODES}
             noteFor={(radical) => radical.meaning}
+            markSeenOnCorrect
           />
         )}
 

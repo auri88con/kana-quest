@@ -121,9 +121,15 @@ export function viewLabel(view) {
   if (view.screen === 'settings') return 'Settings'
   if (view.screen === 'notfound') return 'Page not found'
   if (view.screen === 'section') {
-    const mode =
-      view.mode === 'radicals' && view.radicalView === 'quiz' ? 'Radicals Quiz' : MODE_LABELS[view.mode]
-    return `${SECTION_LABELS[view.section]}, ${mode}`
+    const section = SECTION_LABELS[view.section]
+    if (view.mode === 'radicals') {
+      if (view.radicalView === 'quiz') return `${section}, Radicals Quiz`
+      // Arriving from a kanji's breakdown chip lands on one particular radical,
+      // so say which one rather than just "Radicals".
+      const focused = radicalByAnyForm[view.focusRadical]
+      return focused ? `${section}, Radicals, ${focused.char} ${focused.name}` : `${section}, Radicals`
+    }
+    return `${section}, ${MODE_LABELS[view.mode]}`
   }
   return 'Home'
 }

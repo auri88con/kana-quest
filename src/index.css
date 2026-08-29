@@ -71,6 +71,7 @@
   --shadow-knob: 0 2px 5px var(--shadow-ambient);
   --glow-hot: 0 0 10px rgba(255, 182, 72, 0.5);
   --glow-blazing: 0 0 14px rgba(225, 75, 60, 0.55);
+  --glow-focus-ring: var(--color-sakura-light);
 
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
@@ -107,6 +108,8 @@
   --shadow-stack: rgba(0, 0, 0, 0.42);
   --shadow-ambient: rgba(0, 0, 0, 0.45);
   --shadow-pop: 0 12px 30px rgba(0, 0, 0, 0.55);
+  /* The light pink reads as haze on the dark ground; this keeps the pulse pink. */
+  --glow-focus-ring: rgba(255, 158, 192, 0.45);
 
   color-scheme: dark;
 }

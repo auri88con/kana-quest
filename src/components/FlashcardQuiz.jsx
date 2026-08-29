@@ -42,8 +42,9 @@ export default function FlashcardQuiz({
   answerModes = DEFAULT_ANSWER_MODES,
   promptKey = 'char',
   noteFor = defaultNote,
+  markSeenOnCorrect = false,
 }) {
-  const { recordQuizAnswer } = useProgressContext()
+  const { recordQuizAnswer, markCharacterSeen } = useProgressContext()
   const { settings } = useSettingsContext()
   // Seeded from the saved preference; switching it here is just for this session.
   const [answerMode, setAnswerMode] = useState(settings.quiz.answerMode) // 'choice' | 'type'
@@ -102,6 +103,11 @@ export default function FlashcardQuiz({
     setBestStreak((b) => Math.max(b, newStreak))
     if (isCorrect) setScore((s) => s + 1)
     recordQuizAnswer(section, isCorrect, newStreak, current.char)
+    // Radicals lead their screen with an "n/66 met" count, so getting one right
+    // in the quiz has to move it — otherwise a whole session reads as no
+    // progress. The character sections count "met" as "looked at in Learn", and
+    // opt out.
+    if (markSeenOnCorrect && isCorrect) markCharacterSeen(section, current.char)
     const milestone = isCorrect && newStreak > 0 && newStreak % STREAK_MILESTONE === 0
     if (settings.sound) playSound(milestone ? 'celebrate' : isCorrect ? 'correct' : 'wrong')
     if (milestone) {

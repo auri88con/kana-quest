@@ -112,6 +112,19 @@
     box-shadow: var(--shadow-card), 0 0 0 4px var(--color-sakura);
   }
   50% {
-    box-shadow: var(--shadow-card), 0 0 0 9px var(--color-sakura-light);
+    box-shadow: var(--shadow-card), 0 0 0 9px var(--glow-focus-ring);
   }
+}
+
+.radical-card-examples-more {
+  display: inline-block;
+  margin-left: 0.3rem;
+  padding: 0 0.3rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-alt);
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  vertical-align: middle;
 }
