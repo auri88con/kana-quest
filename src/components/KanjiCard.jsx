@@ -16,7 +16,7 @@ export default function KanjiCard({ section, data, onOpenRadical }) {
   const parts = componentsOf(data)
 
   return (
-    <div className={`kana-card ${seen ? 'is-seen' : ''}`}>
+    <div className={`kana-card kanji-card ${seen ? 'is-seen' : ''}`}>
       {seen && <span className="kana-card-check" aria-hidden="true">✓</span>}
 
       <button

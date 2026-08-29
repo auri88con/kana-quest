@@ -97,23 +97,21 @@
   word-break: break-word;
 }
 
-/* Arrived here from a kanji's "built from" chip: a ring that pulses twice and
-   then gets out of the way, so the card is findable without staying shouty. */
+/* Arrived here from a kanji's "built from" chip. The ring is the resting state
+   and the animation only pulses it — so when motion is dialled down (by the OS
+   media query or the app setting, both of which flatten every animation to
+   0.01ms), the card is still ringed rather than flashing and vanishing. */
 .radical-card.is-focused {
+  box-shadow: var(--shadow-card), 0 0 0 4px var(--color-sakura);
   animation: radical-focus 1.1s var(--ease-spring) 2;
 }
 
 @keyframes radical-focus {
   0%,
   100% {
-    box-shadow: var(--shadow-card);
-  }
-  50% {
     box-shadow: var(--shadow-card), 0 0 0 4px var(--color-sakura);
   }
-}
-
-:root[data-reduce-motion='true'] .radical-card.is-focused {
-  animation: none;
-  box-shadow: var(--shadow-card), 0 0 0 4px var(--color-sakura);
+  50% {
+    box-shadow: var(--shadow-card), 0 0 0 9px var(--color-sakura-light);
+  }
 }

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run check:radicals && vite build",
     "lint": "oxlint",
     "check:radicals": "node scripts/check-radicals.mjs",
     "preview": "vite preview"

@@ -14,8 +14,7 @@
   align-items: center;
   gap: 0.25rem;
   width: 100%;
-  margin-top: 0.55rem;
-  padding-top: 0.5rem;
+  padding: 0.5rem 0.6rem 0.75rem;
   border-top: 2px dotted var(--color-border-soft);
 }
 
@@ -66,21 +65,39 @@
 }
 
 /* The card root is a div (the chips below are buttons), so the body carries the
-   "mark it met" click and has to un-button itself. */
+   "mark it met" click and has to un-button itself. The card's own padding moves
+   onto the body and the footer, so the whole card face stays tappable rather
+   than leaving a dead border around the edge. */
+.kanji-card {
+  padding: 0;
+}
+
 .kanji-card-body {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.35rem;
   width: 100%;
+  /* Grid rows stretch every card to the tallest in the row, and that slack used
+     to be inside the button. Absorbing it keeps the whole card face tappable. */
+  flex: 1;
   background: none;
   border: 0;
-  padding: 0;
+  padding: 0.9rem 0.6rem 0.75rem;
   margin: 0;
   font: inherit;
   color: inherit;
   text-align: center;
   cursor: pointer;
+}
+
+/* .kana-card:active can't be relied on now that the root is a div — iOS only
+   applies :active to elements that are themselves interactive. Driving it off
+   whichever child is pressed keeps the squish on every platform. */
+.kanji-card:has(.kanji-card-body:active),
+.kanji-card:has(.kanji-parts-chip:active) {
+  transform: translateY(2px) scale(0.97);
+  box-shadow: var(--shadow-card-press);
 }
 
 .kanji-parts-chip {

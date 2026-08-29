@@ -13,9 +13,15 @@ export default function RadicalBrowser({ onOpenLearn, focusChar }) {
 
   // Arriving from a kanji's "built from" chip: bring that radical into view
   // rather than dropping the reader at the top of a 66-card grid.
+  //
+  // Deferred a frame on purpose. A push navigation makes useRouter reset the
+  // scroll twice — once in its layout effect and once in a requestAnimationFrame
+  // after it — and this passive effect lands between the two. Queueing our own
+  // frame puts the scroll after the router's, instead of racing it.
   useEffect(() => {
-    if (!focusChar || !focusRef.current) return
-    focusRef.current.scrollIntoView({ block: 'center' })
+    if (!focusChar) return undefined
+    const frame = requestAnimationFrame(() => focusRef.current?.scrollIntoView({ block: 'center' }))
+    return () => cancelAnimationFrame(frame)
   }, [focusChar])
 
   return (
