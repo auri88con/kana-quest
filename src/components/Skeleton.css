@@ -35,6 +35,19 @@
   border-radius: var(--radius-md);
 }
 
+.skeleton-panels {
+  width: 100%;
+  max-width: 620px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.skeleton-panel {
+  height: 190px;
+  border-radius: var(--radius-lg);
+}
+
 @media (max-width: 720px) {
   .skeleton-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));

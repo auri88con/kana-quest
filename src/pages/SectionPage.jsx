@@ -80,7 +80,8 @@ export default function SectionPage({ view, onChange, onBack }) {
   const mode = view.mode
   const style = view.style
   const script = view.script ?? settings.quiz.verbScript
-  const tier = config.tiers && !config.tiers[view.tier] ? 1 : view.tier
+  // Validated against this section's real tier list in utils/routes.js.
+  const tier = view.tier
 
   if (!config.ready) {
     return (

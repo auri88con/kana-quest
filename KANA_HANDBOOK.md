@@ -175,6 +175,8 @@ Every screen is addressable, so the phone's back button walks back through the a
 - **Refinement tabs replace** it (tier, polite/plain, kanji/kana) so back isn't clogged with them — `navigate(view, { replace: true })`
 - `SectionPage` holds **no tab state of its own** — mode/tier/style/script come in as `view` props and go out through `onChange`. A new tab dimension means adding it to `routes.js` first
 - Anything unparseable resolves to the `notfound` screen (a card with a way home), never a throw
+- Tiers are validated against the section's real tier list, read from `kanjiTierMeta` / `verbTierMeta` — so `/verbs/learn?tier=4` (verbs has three tiers) can't reach the page, and adding a tier to a data file needs no change in `routes.js`
+- After every parse the address bar is canonicalised (`formatView` of the resolved view), so a URL never claims a state the screen isn't in
 - Scroll position is stashed on the entry being left and restored on `popstate`, with `history.scrollRestoration = 'manual'` — coming back to a long grid lands where you were
 - Deep links need the host to serve `index.html` for unknown paths: that's what `vercel.json`'s rewrite does (and what the service worker does offline). The rewrite deliberately **excludes** `assets/`, `icons/`, `mascots/`, `sw.js` and the manifest — a missing asset must 404 honestly, because an SPA fallback answering a script request with HTML at 200 is exactly the thing that poisons the offline cache
 - Navigating to the URL you are already on is a no-op, so re-tapping the active tab can't stack entries that make Back look broken
@@ -193,6 +195,8 @@ A second localStorage blob, `kana-quest-settings-v1`, kept separate from progres
 ```
 
 `useSettings` applies them as side effects rather than prop-drilling: `data-theme` and `data-reduce-motion` on `<html>` (the CSS does the rest) plus the `<meta name="theme-color">` tint. `index.html` runs a tiny inline script that reads the same key before first paint, so a dark-theme user never sees a flash of cream — **if the storage key or theme shape changes, that script has to change with it.** There is exactly one, media-less, `theme-color` tag: the theme is a user setting rather than an OS preference, and a `media`-scoped tag would outrank whatever the script and the hook write into it.
+
+The theme pills label System with what it currently resolves to ("System · Dark"), since otherwise System and the matching pinned option look like duplicates.
 
 Settings → About shows the version from `package.json`, injected as the `__APP_VERSION__` define in `vite.config.js` — bump `version` when a stage ships (Stage 6.5 set it to `0.6.5`).
 
@@ -235,7 +239,8 @@ All shared visual primitives — `.btn` (+ `-sakura`/`-outline`/`-danger`), `.ic
 - **Hover lift is desktop-only**, inside `@media (hover: hover) and (pointer: fine)` — on touch a hover style just sticks
 - `--ease-spring` (`cubic-bezier(0.34, 1.56, 0.64, 1)`) is the house easing for anything that should feel springy
 - Screen changes animate via `.view-swap` (keyed on the route in `App.jsx`), tab changes via `.section-pane` (keyed on mode/tier/style/script) — fast, never sluggish
-- `.skeleton` + `Skeleton.jsx` cover anything that takes a moment (today: the lazily-loaded section and settings chunks)
+- `.skeleton` + `Skeleton.jsx` cover anything that takes a moment (today: the lazily-loaded section and settings chunks). It takes a `variant` — `grid` for the card screens, `panels` for Settings — so the placeholder is the shape of what's arriving
+- Shadows and glows are tokens too (`--shadow-badge`, `--shadow-knob`, `--glow-hot`, `--glow-blazing`): **no component stylesheet contains a raw colour**, which is what keeps the dark theme honest
 - **Motion is opt-out**: both `@media (prefers-reduced-motion: reduce)` and the Settings toggle (`:root[data-reduce-motion='true']`) collapse animation and transition durations
 
 ---

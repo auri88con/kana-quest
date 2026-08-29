@@ -44,6 +44,12 @@ export default function App() {
   // step, tier/style/script refinements replace the entry instead.
   const updateSection = (patch, options) => navigate({ ...view, ...patch }, options)
 
+  // Tab titles and back-history entries should say which screen they are.
+  useEffect(() => {
+    const label = viewLabel(view)
+    document.title = view.screen === 'home' ? 'Kana Quest' : `${label} · Kana Quest`
+  }, [view])
+
   // Keyboard and screen-reader users would otherwise be left at the top of the
   // document after a navigation, with nothing announced.
   useEffect(() => {
@@ -64,7 +70,7 @@ export default function App() {
           </p>
           <main className="app-main" ref={mainRef} tabIndex={-1}>
             <ErrorBoundary resetKey={screenKey}>
-              <Suspense fallback={<Skeleton />}>
+              <Suspense fallback={<Skeleton variant={view.screen === 'settings' ? 'panels' : 'grid'} />}>
                 {/* Keyed on the screen so each arrival gets its springy entrance. */}
                 <div className="view-swap" key={screenKey}>
                   {view.screen === 'home' && <Home onOpenSection={openSection} />}

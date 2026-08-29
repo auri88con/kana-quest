@@ -47,7 +47,7 @@
   border-radius: 50%;
   font-size: 0.85rem;
   border: 2px solid var(--color-surface);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-badge);
 }
 
 .kana-card-char {

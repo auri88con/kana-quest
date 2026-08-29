@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSettingsContext } from '../context/SettingsContext'
 import { useProgressContext } from '../context/ProgressContext'
 import { THEME_OPTIONS } from '../utils/settings'
@@ -52,11 +52,24 @@ function Toggle({ label, checked, onChange }) {
   )
 }
 
+const RESET_NOTICE_MS = 5000
+
 export default function Settings({ onBack }) {
-  const { settings, setSetting, setQuizSetting, resetSettings } = useSettingsContext()
+  const { settings, resolvedTheme, setSetting, setQuizSetting, resetSettings } = useSettingsContext()
   const { resetProgress } = useProgressContext()
   const [confirmingReset, setConfirmingReset] = useState(false)
   const [resetDone, setResetDone] = useState(false)
+  const noticeTimeout = useRef(null)
+
+  useEffect(() => () => clearTimeout(noticeTimeout.current), [])
+
+  // The theme pills otherwise look duplicated whenever System resolves to the
+  // same thing as the pinned option next to it.
+  const themeOptions = THEME_OPTIONS.map((option) =>
+    option.key === 'system'
+      ? { ...option, label: `System · ${resolvedTheme === 'dark' ? 'Dark' : 'Light'}` }
+      : option,
+  )
 
   function handleSoundChange(next) {
     setSetting('sound', next)
@@ -67,6 +80,9 @@ export default function Settings({ onBack }) {
     resetProgress()
     setConfirmingReset(false)
     setResetDone(true)
+    // A note, not a new screen state: the reset buttons stay reachable.
+    clearTimeout(noticeTimeout.current)
+    noticeTimeout.current = setTimeout(() => setResetDone(false), RESET_NOTICE_MS)
   }
 
   return (
@@ -83,7 +99,7 @@ export default function Settings({ onBack }) {
         <SettingRow label="Theme" hint="Cream by day, indigo by night">
           <ChoiceGroup
             label="Theme"
-            options={THEME_OPTIONS}
+            options={themeOptions}
             value={settings.theme}
             onChange={(key) => setSetting('theme', key)}
           />
@@ -132,9 +148,13 @@ export default function Settings({ onBack }) {
           Everything — progress, streaks and these preferences — is stored on this device only. Nothing is uploaded, and
           the app keeps working with no connection.
         </p>
-        {resetDone ? (
-          <p className="settings-note is-done">Progress cleared. Time for a fresh quest! 🌱</p>
-        ) : confirmingReset ? (
+        {resetDone && (
+          <p className="settings-note is-done anim-pop-in" role="status">
+            Progress cleared. Time for a fresh quest! 🌱
+          </p>
+        )}
+
+        {confirmingReset ? (
           <div className="settings-danger-confirm">
             <p className="settings-note">Clear every character marked as met, all quiz stats and unlocked levels?</p>
             <div className="settings-danger-actions">

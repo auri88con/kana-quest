@@ -10,7 +10,20 @@
 //
 // Anything unrecognised resolves to the `notfound` screen rather than throwing.
 
+import { kanjiTierMeta } from '../data/kanji'
+import { verbTierMeta } from '../data/verbs'
+
 export const SECTIONS = ['hiragana', 'katakana', 'kanji', 'verbs']
+
+// Read off the same tier metadata the section page renders its tabs from, so
+// adding a tier to a data file needs no change here — and a tier that doesn't
+// exist (`?tier=4` on verbs) can never reach the page.
+const SECTION_TIERS = {
+  hiragana: [],
+  katakana: [],
+  kanji: Object.keys(kanjiTierMeta).map(Number),
+  verbs: Object.keys(verbTierMeta).map(Number),
+}
 
 export const SECTION_MODES = {
   hiragana: ['learn', 'quiz', 'reading'],
@@ -23,11 +36,10 @@ export const HOME_VIEW = { screen: 'home' }
 
 const STYLES = ['polite', 'plain']
 const SCRIPTS = ['char', 'kana']
-const MAX_TIER = 4
 
-function parseTier(raw) {
+function parseTier(raw, section) {
   const tier = Number(raw)
-  return Number.isInteger(tier) && tier >= 1 && tier <= MAX_TIER ? tier : 1
+  return SECTION_TIERS[section].includes(tier) ? tier : 1
 }
 
 export function parseLocation(pathname, search = '') {
@@ -51,7 +63,7 @@ export function parseLocation(pathname, search = '') {
     screen: 'section',
     section,
     mode,
-    tier: parseTier(params.get('tier')),
+    tier: parseTier(params.get('tier'), section),
     style: STYLES.includes(style) ? style : 'polite',
     // Left null when absent so the section page can fall back to the user's
     // saved kanji/kana preference instead of a hardcoded default.

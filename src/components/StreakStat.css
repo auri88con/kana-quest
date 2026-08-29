@@ -5,11 +5,11 @@
 .streak-stat.is-hot {
   animation: flame-flicker 0.6s ease infinite;
   color: var(--color-gold);
-  box-shadow: 0 0 10px rgba(255, 182, 72, 0.5);
+  box-shadow: var(--glow-hot);
 }
 
 .streak-stat.is-blazing {
   animation: flame-flicker 0.4s ease infinite;
   color: var(--color-red);
-  box-shadow: 0 0 14px rgba(225, 75, 60, 0.55);
+  box-shadow: var(--glow-blazing);
 }

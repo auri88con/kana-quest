@@ -18,6 +18,9 @@ function currentView() {
  *   isn't clogged with them
  * - scroll position is stashed on the entry being left and restored on `popstate`,
  *   so coming back to a long character grid lands where you were
+ * - the address bar is canonicalised after every parse, so a URL carrying
+ *   something the app had to fall back on (`/verbs/learn?tier=4`, which verbs
+ *   doesn't have) stops claiming a state the screen isn't in
  */
 export function useRouter() {
   const [view, setView] = useState(currentView)
@@ -28,6 +31,14 @@ export function useRouter() {
       window.history.scrollRestoration = 'manual'
     }
   }, [])
+
+  useEffect(() => {
+    if (view.screen === 'notfound') return
+    const canonical = formatView(view)
+    if (canonical !== window.location.pathname + window.location.search) {
+      window.history.replaceState(window.history.state, '', canonical)
+    }
+  }, [view])
 
   useEffect(() => {
     function onPopState(event) {
