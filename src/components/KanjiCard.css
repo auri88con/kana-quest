@@ -64,3 +64,38 @@
   font-weight: 600;
   color: var(--color-text-muted);
 }
+
+/* The card root is a div (the chips below are buttons), so the body carries the
+   "mark it met" click and has to un-button itself. */
+.kanji-card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+
+.kanji-parts-chip {
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.12s var(--ease-spring);
+}
+
+.kanji-parts-chip:active {
+  transform: scale(0.92);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .kanji-parts-chip:hover {
+    background: var(--color-border-soft);
+  }
+}

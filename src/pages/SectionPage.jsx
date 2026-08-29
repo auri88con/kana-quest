@@ -240,10 +240,19 @@ export default function SectionPage({ view, onChange, onBack }) {
           <VerbBrowser section={view.section} characters={tierCharacters} style={style} />
         )}
 
-        {mode === 'learn' && config.isKanji && <KanjiBrowser section={view.section} characters={tierCharacters} />}
+        {mode === 'learn' && config.isKanji && (
+          <KanjiBrowser
+            section={view.section}
+            characters={tierCharacters}
+            onOpenRadical={(char) => onChange({ mode: 'radicals', radicalView: 'browse', focusRadical: char })}
+          />
+        )}
 
         {mode === 'radicals' && radicalView === 'browse' && (
-          <RadicalBrowser onOpenLearn={() => onChange({ mode: 'learn' })} />
+          <RadicalBrowser
+            onOpenLearn={() => onChange({ mode: 'learn', focusRadical: null })}
+            focusChar={view.focusRadical}
+          />
         )}
 
         {mode === 'radicals' && radicalView === 'quiz' && (

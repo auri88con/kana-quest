@@ -60,7 +60,7 @@ export function useSettings() {
   }, [])
 
   return useMemo(
-    () => ({ settings, resolvedTheme, setSetting, setQuizSetting, resetSettings }),
-    [settings, resolvedTheme, setSetting, setQuizSetting, resetSettings],
+    () => ({ settings, resolvedTheme, systemDark, setSetting, setQuizSetting, resetSettings }),
+    [settings, resolvedTheme, systemDark, setSetting, setQuizSetting, resetSettings],
   )
 }

@@ -6,7 +6,7 @@ const MAX_EXAMPLES = 5
 
 // Radicals live in their own progress bucket, so (unlike the kana and kanji
 // cards) this doesn't take a `section` — there is only ever one.
-export default function RadicalCard({ data, examples = [] }) {
+export default function RadicalCard({ data, examples = [], focused = false, innerRef }) {
   const { progress, markCharacterSeen } = useProgressContext()
   const seen = progress.radicals?.seenCharacters.includes(data.char)
   const shown = examples.slice(0, MAX_EXAMPLES)
@@ -14,7 +14,8 @@ export default function RadicalCard({ data, examples = [] }) {
   return (
     <button
       type="button"
-      className={`kana-card radical-card ${seen ? 'is-seen' : ''}`}
+      ref={innerRef}
+      className={`kana-card radical-card ${seen ? 'is-seen' : ''} ${focused ? 'is-focused' : ''}`}
       onClick={() => markCharacterSeen('radicals', data.char)}
     >
       {seen && <span className="kana-card-check" aria-hidden="true">✓</span>}

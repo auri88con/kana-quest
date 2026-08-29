@@ -55,7 +55,7 @@ function Toggle({ label, checked, onChange }) {
 const RESET_NOTICE_MS = 5000
 
 export default function Settings({ onBack }) {
-  const { settings, resolvedTheme, setSetting, setQuizSetting, resetSettings } = useSettingsContext()
+  const { settings, systemDark, setSetting, setQuizSetting, resetSettings } = useSettingsContext()
   const { resetProgress } = useProgressContext()
   const [confirmingReset, setConfirmingReset] = useState(false)
   const [resetDone, setResetDone] = useState(false)
@@ -64,10 +64,12 @@ export default function Settings({ onBack }) {
   useEffect(() => () => clearTimeout(noticeTimeout.current), [])
 
   // The theme pills otherwise look duplicated whenever System resolves to the
-  // same thing as the pinned option next to it.
+  // same thing as the pinned option next to it. This reports what the *device*
+  // prefers, not the theme currently in force — otherwise pinning Light makes
+  // the System pill claim the device is light too.
   const themeOptions = THEME_OPTIONS.map((option) =>
     option.key === 'system'
-      ? { ...option, label: `System · ${resolvedTheme === 'dark' ? 'Dark' : 'Light'}` }
+      ? { ...option, label: `System · ${systemDark ? 'Dark' : 'Light'}` }
       : option,
   )
 

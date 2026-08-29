@@ -6,12 +6,14 @@
 //   /settings               settings screen
 //   /hiragana               a section, in its default Learn mode
 //   /kanji/quiz?tier=2      a section mode, with its tab state in the query
+//   /kanji/radicals?focus=木  the radical grid, scrolled to one radical
 //   /verbs/conjugation?tier=1&style=plain
 //
 // Anything unrecognised resolves to the `notfound` screen rather than throwing.
 
 import { kanjiTierMeta } from '../data/kanji'
 import { verbTierMeta } from '../data/verbs'
+import { radicalByAnyForm } from '../data/radicals'
 
 export const SECTIONS = ['hiragana', 'katakana', 'kanji', 'verbs']
 
@@ -61,6 +63,8 @@ export function parseLocation(pathname, search = '') {
   const style = params.get('style')
   const script = params.get('script')
   const radicalView = params.get('view')
+  // Validated against the real radical set, so ?focus=zzz can't reach the page.
+  const focusRadical = radicalByAnyForm[params.get('focus')]?.char ?? null
 
   return {
     screen: 'section',
@@ -68,6 +72,7 @@ export function parseLocation(pathname, search = '') {
     mode,
     tier: parseTier(params.get('tier'), section),
     radicalView: RADICAL_VIEWS.includes(radicalView) ? radicalView : 'browse',
+    focusRadical,
     style: STYLES.includes(style) ? style : 'polite',
     // Left null when absent so the section page can fall back to the user's
     // saved kanji/kana preference instead of a hardcoded default.
@@ -84,6 +89,9 @@ export function formatView(view) {
   // Scoped to the mode that owns it, so a detour through Radicals doesn't leave
   // `?view=quiz` hanging off the Learn URL.
   if (view.mode === 'radicals' && view.radicalView === 'quiz') params.set('view', 'quiz')
+  if (view.mode === 'radicals' && view.radicalView !== 'quiz' && view.focusRadical) {
+    params.set('focus', view.focusRadical)
+  }
   if (view.style && view.style !== 'polite') params.set('style', view.style)
   if (view.script) params.set('script', view.script)
 
@@ -127,6 +135,7 @@ export function sectionView(section, patch = {}) {
     mode: 'learn',
     tier: 1,
     radicalView: 'browse',
+    focusRadical: null,
     style: 'polite',
     script: null,
     ...patch,

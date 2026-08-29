@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import RadicalCard from './RadicalCard'
 import { useProgressContext } from '../context/ProgressContext'
 import { radicals, radicalsByGroup } from '../data/radicals'
@@ -5,9 +6,17 @@ import { kanjiByRadical } from '../utils/radicals'
 import './CharacterBrowser.css'
 import './RadicalBrowser.css'
 
-export default function RadicalBrowser({ onOpenLearn }) {
+export default function RadicalBrowser({ onOpenLearn, focusChar }) {
   const { progress } = useProgressContext()
   const met = progress.radicals?.seenCharacters.length ?? 0
+  const focusRef = useRef(null)
+
+  // Arriving from a kanji's "built from" chip: bring that radical into view
+  // rather than dropping the reader at the top of a 66-card grid.
+  useEffect(() => {
+    if (!focusChar || !focusRef.current) return
+    focusRef.current.scrollIntoView({ block: 'center' })
+  }, [focusChar])
 
   return (
     <div className="character-browser radical-browser">
@@ -38,7 +47,13 @@ export default function RadicalBrowser({ onOpenLearn }) {
           </h4>
           <div className="radical-grid">
             {group.radicals.map((radical) => (
-              <RadicalCard key={radical.char} data={radical} examples={kanjiByRadical[radical.char]} />
+              <RadicalCard
+                key={radical.char}
+                data={radical}
+                examples={kanjiByRadical[radical.char]}
+                focused={radical.char === focusChar}
+                innerRef={radical.char === focusChar ? focusRef : undefined}
+              />
             ))}
           </div>
         </div>
