@@ -50,7 +50,8 @@ scripts/
   vite-plugin-service-worker.js
                             build plugin: stamps the hashed asset list into the template, emits dist/sw.js
   generate-icons.mjs        one-off: rasterises public/icons/icon.svg into the PNG icon set
-  check-radicals.mjs        validates the radical set and every kanji breakdown (npm run check:radicals)
+  check-radicals.mjs        validates the radical set, every kanji breakdown and the whole mnemonic
+                            corpus (npm run check:radicals — also runs as part of npm run build)
 public/
   manifest.webmanifest      name, colours, icons, section shortcuts
   icons/                    icon.svg (source + favicon) and the generated PNGs
@@ -73,13 +74,15 @@ src/
     UpdateToast.jsx          "New version ready" notice when a new worker claims the page
     Skeleton.jsx             shimmer placeholder used as the lazy-screen Suspense fallback
     CharacterBrowser.jsx      Learn-mode grid for Hiragana/Katakana (main rows + dakuon/handakuon/yoon sub-tabs)
-    CharacterCard.jsx         one card: character, romaji, emoji, example word
+    CharacterCard.jsx         one card: character, romaji, emoji, example word, mnemonic disclosure
+    Mnemonic.jsx              the "How to remember" disclosure: story, why, and (kanji only) the reading
+                              hook. Collapsed on a card, opened automatically in quiz feedback
     KanjiBrowser.jsx          Learn-mode grid for Kanji (flat grid per tier)
     KanjiCard.jsx             like CharacterCard but adds a meaning line and, where the data has one,
                               a "built from" / "contains" radical breakdown;
                               one composite keyboard stop (Tab between cards, arrows within one)
     RadicalBrowser.jsx        Radicals-mode grid: the learn-these-first panel + the six radical groups
-    RadicalCard.jsx           one radical: shape, stroke count, variants, name/nickname, and the kanji it appears in
+    RadicalCard.jsx           one radical: shape, stroke count, variants, name/nickname, the kanji it appears in
     VerbBrowser.jsx           Learn-mode grid for Verbs (flat grid per tier)
     VerbCard.jsx              dictionary form as hero + the conjugation table for the active style
     FlashcardQuiz.jsx         shared quiz engine for all sections; kanji/verbs pass an `answerModes` prop
@@ -93,6 +96,7 @@ src/
     ProgressContext.jsx       thin context wrapper around useProgress
     SettingsContext.jsx       thin context wrapper around useSettings
   hooks/
+    useCardStops.js           roving tabindex: a card is one Tab stop, arrows move within it
     useProgress.js            all progress-mutating logic: markCharacterSeen, recordQuizAnswer,
                               recordReadingAnswer (reading-game level unlocks), recordConjugationAnswer
     useSettings.js            preference state + persistence, and the side effects that apply it
@@ -112,6 +116,8 @@ src/
     hiragana.js, katakana.js  character sets grouped into main rows / voiced / handakuon / yoon
     kanji.js                  4 tiers of kanji, Tier 1 annotated with its component radicals
     radicals.js               the 66 common radicals, grouped
+    mnemonics/                the story layer, one file per script: radicals.js, kanji.js, hiragana.js,
+                              katakana.js, plus index.js (per-section maps and the mnemonicFor lookup)
     verbs.js                  3 tiers of verbs, each tagged with its conjugation group
     readingGame.js            reading-game vocabulary, per section, per level (1-5)
 ```
@@ -175,6 +181,26 @@ build and the deploy rather than shipping.
 
 Romaji everywhere uses the literal-transliteration convention — long vowels spelled per the actual kana (`koori`, not `kōri`), topic-marker は written `wa`, object-marker を written `wo` (both interchangeable with `o` at match time via `utils/romaji.js`, but they read better in feedback).
 
+**`data/mnemonics/`** — the story layer, one file per script (`radicals.js`, `kanji.js`, `hiragana.js`, `katakana.js`) plus an `index.js` that flattens them per section. 484 entries, every one two fields:
+
+```js
+'休': {
+  story: 'A person (亻) flopped against a tree (木). Not moving. Do not disturb.',
+  why:   '亻 person + 木 tree — the clearest compound kanji there is.',
+}
+```
+
+`story` is the playful hook — it is allowed to be silly, because that is what makes it stick. `why` is the grounded reason, and it is what stops the silly version being a lie. On a card they are set in different registers so the joke and the fact never read as the same kind of claim. **Keep both.** A story with no `why` is the failure mode this shape exists to prevent.
+
+`kanji.js` also exports `kanjiReadingMnemonics`, keyed the same way, holding `{ hook, weak? }`. These are pure English wordplay on the sound with no claim to be etymology, which is why they stay separate from the stories in the data *and* on the card. `weak: true` marks a hook that does not really work; the validator counts them so they are easy to come back to (currently none).
+
+What the accuracy rule means here: a story may invent an *image*, but everything it is built on stays true — readings, meanings, the radical decompositions, and any compound cited. `npm run check:radicals` enforces the sharp end of that: **where `kanji.js` lists components, the `why` must name them**, in any written form (亻 counts for 人, 灬 for 火, 玉 for 王). Vague a `why` out and the build fails. Coverage for every script is reported on every run.
+
+Two conventions worth keeping:
+
+- **Kana `why` fields name the source character.** Every kana derives from a specific kanji — あ from 安, ニ from 二 — and several are characters the app already teaches, which is what ties the three scripts together. Where a source is uncertain, describe the shape instead; never guess an etymology.
+- **Look-alikes are handled in pairs, each card naming the other.** ぬ/め, さ/ち, る/ろ, ね/れ/わ, シ/ツ, ソ/ン, and the katakana drawn identically to a kanji or radical (カ/力, ロ/口, ニ/二, タ/夕, ト/卜, ム/厶, リ/刂, ハ/八, ミ/三, ル/儿, ヒ/匕, エ/工). Adding to one side means adding the warning to the other.
+
 ### Progress & storage
 
 One JSON blob in `localStorage` under `kana-quest-progress-v1`:
@@ -199,6 +225,15 @@ map is keyed by radical `char` → `{ attempts, correct, lastCorrect, lastPracti
 `recordQuizAnswer(section, isCorrect, streak, itemChar)` writes it whenever the section has a `mastery` map, and
 ignores `itemChar` when it doesn't. Only the four character sections appear on the dashboard totals; radicals
 surface as an extra mini-stat on the Kanji card.
+
+### Card structure
+
+Every character card — kana, kanji, radical — is a `<div>` with the card face as a `<button>` inside it, not a button at the root. That is forced: cards now carry other buttons (radical chips, the mnemonic disclosure) and a button inside a button is invalid HTML. Consequences worth knowing before touching a card:
+
+- The root's padding lives on `.kana-card-body` / `.radical-card-body` and the footers, and the body takes `flex: 1`, so the whole card face stays tappable. A grid row stretches every card to its tallest, and that slack has to be absorbed or it becomes a dead strip.
+- `.kana-card:active` can't be relied on — iOS only applies `:active` to elements that are interactive themselves — so the press squish is driven by `:has(.card-stop:active)`, with an `@supports` fallback for pre-`:has` browsers.
+- **A card is one Tab stop.** Every control inside it opts in with the `card-stop` class and takes its tabIndex from `hooks/useCardStops.js`; ←/→ move between them. Without this the Tier 1 kanji grid would be 295 tab stops instead of 105. Verbs are the exception — `VerbCard` has a single control and stays a plain button.
+- An open mnemonic makes its card span the whole grid row (`grid-column: 1 / -1`). At 360px a card is ~100px wide, which would set the prose as a six-character ribbon.
 
 ### Routing & navigation
 
@@ -328,8 +363,8 @@ They react after quizzes, celebrate streaks and milestones, and idle on the home
 | 6 | Verbs tab — 3 tiers, polite/plain conjugations, conjugation quiz | ✅ Done |
 | 6.5 | Feel & flow — installable PWA + offline, depth/press/motion pass, dark theme, history-API navigation, settings screen | ✅ Done |
 | 7 | Radicals system — 66 radicals, kanji breakdowns, radical quiz | ✅ Done |
-| 8 | Mnemonics & stories | ⬜ Next |
-| 9 | Spaced repetition (SRS) | ⬜ |
+| 8 | Mnemonics & stories — 484 entries across all three scripts, shown on cards and on a wrong quiz answer | ✅ Done |
+| 9 | Spaced repetition (SRS) | ⬜ Next |
 | 10 | Font trainer | ⬜ |
 | 11 | Writing practice | ⬜ |
 | 12 | Listening mode | ⬜ |

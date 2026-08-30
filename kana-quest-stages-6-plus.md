@@ -152,6 +152,18 @@ Add a memorable story layer on top of the radicals system (WaniKani-style, but i
 
 ---
 
+**As built (Stage 8 complete).** The scope was widened during the stage, so this brief no longer matches what shipped. What was actually agreed and delivered:
+
+- **All three scripts get full coverage, not just radicals and Tier 1 kanji.** 66 radicals, 105 kanji stories, 105 reading hooks, 104 hiragana, 104 katakana — 484 entries.
+- **Every dakuon, handakuon and yōon character gets its own mnemonic** (116 of them). The proposal to cover those with three shared rules was rejected; each names its own base character and its own sound shift.
+- **Reading hooks cover all 105 Tier 1 kanji**, not only the confusable ones.
+- **Two fields, not one:** `story` (the silly hook) and `why` (the grounded reason). The voice is playful *and* explanatory rather than either alone.
+- The confusable-kana requirement is met inside each script's file rather than as a separate list, in pairs where each card names the other, and extended to the kanji/katakana look-alikes (カ/力, ロ/口, …) in both directions.
+
+See the Data shapes section of `KANA_HANDBOOK.md` for the shape, the accuracy rule and the validator that enforces it.
+
+---
+
 ## STAGE 9 — Spaced Repetition (SRS)
 
 Add a spaced repetition system across the whole app:
