@@ -11,6 +11,18 @@ import { radicals, radicalGroups, radicalByAnyForm } from '../src/data/radicals.
 import { kanjiTier1, kanjiAllCharacters } from '../src/data/kanji.js'
 import { radicalMnemonics } from '../src/data/mnemonics/radicals.js'
 import { kanjiMnemonics, kanjiReadingMnemonics } from '../src/data/mnemonics/kanji.js'
+import {
+  hiraganaMnemonics,
+  hiraganaVoicedMnemonics,
+  hiraganaHandakuonMnemonics,
+  hiraganaYoonMnemonics,
+} from '../src/data/mnemonics/hiragana.js'
+import {
+  hiraganaMainRows,
+  hiraganaVoiced,
+  hiraganaHandakuon,
+  hiraganaYoon,
+} from '../src/data/hiragana.js'
 
 const errors = []
 const warnings = []
@@ -104,6 +116,30 @@ for (const [char, entry] of Object.entries(kanjiReadingMnemonics)) {
 const missingReadingHooks = kanjiTier1.filter((k) => !kanjiReadingMnemonics[k.char])
 const weakReadingHooks = Object.entries(kanjiReadingMnemonics).filter(([, e]) => e.weak)
 
+// Kana mnemonics, checked group by group against the character data — so a
+// character added to a row later shows up here as missing rather than quietly
+// rendering a card with no story on it.
+const charsOf = (groups) => groups.flatMap((g) => g.characters.map((c) => c.char))
+const kanaGroups = [
+  ['hiragana base', charsOf(hiraganaMainRows), hiraganaMnemonics],
+  ['hiragana voiced', charsOf(hiraganaVoiced), hiraganaVoicedMnemonics],
+  ['hiragana handakuon', charsOf(hiraganaHandakuon), hiraganaHandakuonMnemonics],
+  ['hiragana yoon', charsOf(hiraganaYoon), hiraganaYoonMnemonics],
+]
+const kanaCoverage = []
+for (const [label, expected, map] of kanaGroups) {
+  for (const [char, entry] of Object.entries(map)) {
+    const where = `${label} mnemonic ${char}`
+    if (!expected.includes(char)) errors.push(`${where}: no such character in that group`)
+    else if (!entry.story?.trim() || !entry.why?.trim()) errors.push(`${where}: missing story or why`)
+  }
+  const missing = expected.filter((c) => !map[c])
+  kanaCoverage.push(
+    `${label}: ${Object.keys(map).length}/${expected.length}` +
+      (missing.length ? ` — still to write: ${missing.join(' ')}` : ''),
+  )
+}
+
 // Unused radicals aren't a defect — the set teaches the common radicals, not
 // only the ones Tier 1 happens to need — but it's worth seeing the number.
 const used = new Set(kanjiAllCharacters.flatMap((k) => k.components ?? []).map((f) => radicalByAnyForm[f]?.char))
@@ -138,6 +174,8 @@ console.log(
     // help with, kept visible so they are easy to come back and rewrite.
     (weakReadingHooks.length ? `, ${weakReadingHooks.length} flagged weak: ${weakReadingHooks.map(([c]) => c).join(' ')}` : ''),
 )
+
+for (const line of kanaCoverage) console.log(line)
 
 for (const w of warnings) console.warn(`warning: ${w}`)
 

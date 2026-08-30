@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import CharacterCard from './CharacterCard'
+import { kanaMnemonics } from '../data/mnemonics/index'
 import './CharacterBrowser.css'
 
 function RowSection({ section, group, compact }) {
@@ -8,7 +9,7 @@ function RowSection({ section, group, compact }) {
       <h4 className="row-section-label">{group.label}</h4>
       <div className={`row-grid ${compact ? 'row-grid-compact' : ''}`}>
         {group.characters.map((c) => (
-          <CharacterCard key={c.char} section={section} data={c} />
+          <CharacterCard key={c.char} section={section} data={c} mnemonic={kanaMnemonics[section]?.[c.char]} />
         ))}
       </div>
     </div>
