@@ -63,7 +63,7 @@ export const hiraganaMnemonics = {
   },
   'し': {
     story: 'A single hook, curving up at the end. A fishing line waiting for a bite.',
-    why: 'From 之. The simplest hiragana there is — one stroke.',
+    why: 'From 之. The simplest hiragana there is — one stroke, sweeping upward. That upward sweep is what its katakana シ keeps, and what tells シ from ツ.',
   },
   'す': {
     story: 'A loop with a long tail dropping through it, like a swing hanging from a bar.',
@@ -75,7 +75,7 @@ export const hiraganaMnemonics = {
   },
   'そ': {
     story: 'A zigzag, like a road switchbacking down a hill.',
-    why: 'From 曽. Written in one stroke in most fonts, two in some — both are correct.',
+    why: 'From 曽. Written in one stroke in most fonts, two in some — both are correct. It falls downward, and so does its katakana ソ, which is how you tell ソ from ン.',
   },
 
   // た row
@@ -89,7 +89,7 @@ export const hiraganaMnemonics = {
   },
   'つ': {
     story: 'A wave curling over. Tsu-nami.',
-    why: 'From 川 (river) — a kanji already in the app, and a fitting source for a wave shape.',
+    why: 'From 川 (river) — a kanji already in the app, and a fitting source for a wave. It falls downward, and so does its katakana ツ: that is how you tell ツ from シ.',
   },
   'て': {
     story: 'A table seen from the side, with one leg.',
@@ -213,7 +213,7 @@ export const hiraganaMnemonics = {
   },
   'ん': {
     story: 'A single lazy squiggle. The only kana that is a consonant all on its own.',
-    why: 'From 无. It can never start a word, which is why しりとり ends the moment somebody says one.',
+    why: 'From 无. It can never start a word, which is why しりとり ends the moment somebody says one. It sweeps upward, and so does its katakana ン — the opposite of ソ.',
   },
 }
 
@@ -224,32 +224,32 @@ export const hiraganaVoicedMnemonics = {
   'が': { story: 'か, but the kite has picked up two ticks of grit. The clean K goes gravelly: GA.', why: 'か + dakuten (゛). K becomes G — the same tick does this all along the row.' },
   'ぎ': { story: 'The key (き) has gone rusty. KI drops into GI.', why: 'き + dakuten. Watch the ticks sit above the key’s teeth.' },
   'ぐ': { story: 'The open beak (く) swallowed something heavy. KU sinks to GU.', why: 'く + dakuten — one stroke, two ticks, done.' },
-  'げ': { story: 'The keg (け) has gone off. KE turns to GE.', why: 'け + dakuten.' },
+  'げ': { story: 'The keg (け) has gone off. KE turns to GE.', why: 'け + dakuten. KE becomes GE — the keg keeps its handle, it just gets heavier.' },
   'ご': { story: 'The two little lines (こ) pick up two more. KO thickens to GO.', why: 'こ + dakuten. Four marks in total — easy to spot in a hurry.' },
   'ざ': { story: 'さ with a buzz on it. SA becomes ZA — say it and your throat starts humming.', why: 'さ + dakuten. S becomes Z all the way along this row.' },
   'じ': { story: 'The fishing hook (し) has caught something that buzzes. SHI becomes JI.', why: 'し + dakuten. Note it is JI, not ZI — the SHI sound bends further than the others.' },
-  'ず': { story: 'The swing (す) is humming on its rope. SU becomes ZU.', why: 'す + dakuten.' },
-  'ぜ': { story: 'The pitchfork (せ) has hit something electric. SE becomes ZE.', why: 'せ + dakuten.' },
-  'ぞ': { story: 'The zigzag road (そ) is now a buzzing one. SO becomes ZO.', why: 'そ + dakuten.' },
+  'ず': { story: 'The swing (す) is humming on its rope. SU becomes ZU.', why: 'す + dakuten. SU becomes ZU. Careful: づ sounds identical and is far rarer.' },
+  'ぜ': { story: 'The pitchfork (せ) has hit something electric. SE becomes ZE.', why: 'せ + dakuten. SE becomes ZE. The ticks sit above the pitchfork’s right arm.' },
+  'ぞ': { story: 'The zigzag road (そ) is now a buzzing one. SO becomes ZO.', why: 'そ + dakuten. SO becomes ZO — the same S-to-Z shift as ざ, じ, ず and ぜ.' },
   'だ': { story: 'た, weighed down. TA drops to DA.', why: 'た + dakuten. T becomes D along this row.' },
   'ぢ': { story: 'ち with ticks. Sounds identical to じ, and you will almost never need to write it.', why: 'ち + dakuten. Modern Japanese uses じ for this sound except in a handful of compound words.' },
   'づ': { story: 'The wave (つ) with ticks. Sounds the same as ず, and is just as rare.', why: 'つ + dakuten. Like ぢ, it survives mainly inside compounds such as つづく.' },
-  'で': { story: 'The one-legged table (て) has been dropped. TE becomes DE.', why: 'て + dakuten.' },
-  'ど': { story: 'The thorn in the toe (と) has gone septic. TO becomes DO.', why: 'と + dakuten.' },
+  'で': { story: 'The one-legged table (て) has been dropped. TE becomes DE.', why: 'て + dakuten. TE becomes DE, and で is a particle in its own right — “by” or “at”.' },
+  'ど': { story: 'The thorn in the toe (と) has gone septic. TO becomes DO.', why: 'と + dakuten. TO becomes DO. Both are two strokes plus the ticks.' },
   'ば': { story: 'は has picked up two ticks and a bad attitude. HA becomes BA.', why: 'は + dakuten. This row does H → B, and the circle version does H → P.' },
-  'び': { story: 'The grin (ひ) has turned into a “bee!” HI becomes BI.', why: 'ひ + dakuten.' },
+  'び': { story: 'The grin (ひ) has turned into a “bee!” HI becomes BI.', why: 'ひ + dakuten. HI becomes BI. The same ひ takes a circle instead to make ぴ.' },
   'ぶ': { story: 'The confused bird (ふ) has been blown over. FU becomes BU.', why: 'ふ + dakuten. Note the base is FU, not HU — but it still voices to B.' },
   'べ': { story: 'The easy little hill (へ) with two ticks. HE becomes BE.', why: 'へ + dakuten. Still the easiest shape in the language, ticks and all.' },
-  'ぼ': { story: 'ほ, hat and all, with ticks on top. HO becomes BO.', why: 'ほ + dakuten.' },
+  'ぼ': { story: 'ほ, hat and all, with ticks on top. HO becomes BO.', why: 'ほ + dakuten. HO becomes BO — and ほ’s extra crossbar is still what separates it from は.' },
 }
 
 // Half-voiced (半濁音 handakuon): a small circle instead of two ticks, and only
 // the は row can take it.
 export const hiraganaHandakuonMnemonics = {
   'ぱ': { story: 'は with a little balloon floating over it. Pop — HA becomes PA.', why: 'は + handakuten (゜). The circle, not the ticks: ticks make BA, the circle makes PA.' },
-  'ぴ': { story: 'The grin (ひ) with a bubble. HI becomes PI.', why: 'ひ + handakuten.' },
-  'ぷ': { story: 'The bird (ふ) blowing a bubble. FU becomes PU.', why: 'ふ + handakuten.' },
-  'ぺ': { story: 'The little hill (へ) with a balloon tied to it. HE becomes PE.', why: 'へ + handakuten.' },
+  'ぴ': { story: 'The grin (ひ) with a bubble. HI becomes PI.', why: 'ひ + handakuten. HI becomes PI. Circle for P, ticks for B — ぴ and び start from the same ひ.' },
+  'ぷ': { story: 'The bird (ふ) blowing a bubble. FU becomes PU.', why: 'ふ + handakuten. FU becomes PU. Note the base is FU, not HU, but it still takes the は-row marks.' },
+  'ぺ': { story: 'The little hill (へ) with a balloon tied to it. HE becomes PE.', why: 'へ + handakuten. HE becomes PE, on the easiest shape in the language.' },
   'ぽ': { story: 'ほ with a bubble on top. HO becomes PO.', why: 'ほ + handakuten. Only the は row gets the circle — nothing else can take one.' },
 }
 

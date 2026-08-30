@@ -29,23 +29,23 @@ export const radicalMnemonics = {
     why: 'Drawn from an old figure of a kneeling person with crossed arms. It turns up in 安 (calm) and 好 (like).',
   },
   '子': {
-    story: 'A baby with both arms flung up and its legs swaddled into one wobbly line.',
+    story: 'A swaddled baby, waving. Wherever it turns up inside a character, a child is mixed up in it.',
     why: 'The horizontal stroke is the outstretched arms; everything below is the wrapped-up bottom half. It is in 学 (study) and 好 (like).',
   },
   '儿': {
     story: 'The bottom half of a person who has lost the rest of themselves. Two little legs, holding up whatever sits on top.',
-    why: 'It only ever appears underneath, never beside. 見 (see) is an eye on legs; 先 (before) and 四 (four) both end the same way.',
+    why: 'It only ever appears underneath, never beside. 見 (see) is an eye on legs; 先 and 四 both end the same way. Careful: the katakana ル (ru) is the same pair of legs.',
   },
   '口': {
     story: 'A wide-open mouth, drawn as a box. Shouting, eating, or just a hole in something — this is your square.',
-    why: 'One of the most common radicals there is. It means an actual mouth in 名 (name) and 語 (language), but often just “an opening”: 四, 右, 古.',
+    why: 'One of the most common radicals there is. It means an actual mouth in 名 (name) and 語 (language), but often just “an opening”: 四, 右, 古. Careful: the katakana ロ (ro) is the same square.',
   },
   '目': {
     story: 'An eye tipped up on its end so it fits in the box. Squint and the pupil lines are still in there.',
     why: 'It was originally drawn sideways like a real eye, then rotated upright when characters were squared off. 見 (see) is this standing on a pair of legs.',
   },
   '耳': {
-    story: 'An ear, lobe and all, pinned flat to the page.',
+    story: 'An ear stuck on the side of a character, listening in on whatever the rest of it is doing.',
     why: 'It carries hearing wherever it goes: 聞 (hear) is an ear in a gateway, listening through the doors.',
   },
   '手': {
@@ -62,7 +62,7 @@ export const radicalMnemonics = {
   },
   '力': {
     story: 'A flexed arm. Not a subtle radical.',
-    why: 'It was originally a plough, which is where the effort comes from. 男 (man) is a field plus this — power in the paddy.',
+    why: 'It was originally a plough, which is where the effort comes from. 男 (man) is a field plus this — power in the paddy. Careful: the katakana カ (ka) is drawn exactly the same.',
   },
   '舌': {
     story: 'A tongue sticking out. The 口 at the bottom is the mouth it is escaping from.',
@@ -75,7 +75,7 @@ export const radicalMnemonics = {
     why: 'It means sun and day, and it is everywhere: 時 (hour), 間 (interval), 東 (east), 明 (bright).',
   },
   '月': {
-    story: 'A crescent moon with two wisps of cloud drifting across it.',
+    story: 'A crescent moon — except when it clings to the left of a kanji, where it is quietly a slab of flesh instead.',
     why: 'It means moon and month. On the left of a kanji it is usually something else entirely — a squashed 肉 (flesh) — which is why body parts like 腕 and 胸 wear it.',
   },
   '火': {
@@ -91,11 +91,11 @@ export const radicalMnemonics = {
     why: 'Two of them make 林 (woods) and three make 森 (forest). It is in 校 (school) and 本 (book) — both things once made of wood.',
   },
   '土': {
-    story: 'A mound of soil pushed up out of flat ground.',
+    story: 'A mound of earth. Build on top of it and you get somewhere to live; bury something under it and you get treasure.',
     why: 'Earth, soil, ground. It is in 社 (shrine) and inside 時 (hour), where it forms part of 寺 (temple).',
   },
   '山': {
-    story: 'Three peaks in a row, the middle one showing off.',
+    story: 'Three peaks. Stack one on top of another and you get 出 — climbing out and over the lot.',
     why: 'One of the oldest picture-characters, barely changed in three thousand years. Two of them stacked make 出 (exit).',
   },
   '川': {
@@ -111,12 +111,12 @@ export const radicalMnemonics = {
     why: 'The cross inside is the irrigation ditches between the plots. 男 (man) is this plus 力 — the one doing the ploughing.',
   },
   '雨': {
-    story: 'A cloud stretched across the top with four fat drops falling out of it.',
+    story: 'A cloud already raining. It only ever sits on the roof of a character, never beside it.',
     why: 'It sits on top of anything weather-related: 雪 (snow), 雲 (cloud), and 電 (electricity), which started life as lightning.',
   },
   '夕': {
     story: 'The moon, but only half risen. The sun has gone and it is not properly night yet.',
-    why: 'It is 月 with one stroke taken away — literally a partial moon. 名 (name) is this plus a mouth: calling out to someone in the dark.',
+    why: 'It is 月 with one stroke removed — literally a partial moon. 名 (name) is this plus a mouth: calling out in the dark. Careful: the katakana タ (ta) is the same shape plus one stroke.',
   },
 
   // Plants & animals
@@ -133,7 +133,7 @@ export const radicalMnemonics = {
     why: 'Squashed onto the top of a kanji it becomes ⺮. It marks things made of bamboo, which in old Japan mostly meant writing gear: 筆 (brush), 箱 (box).',
   },
   '米': {
-    story: 'Grains flying off in every direction as the ear gets threshed.',
+    story: 'Scattered grain. When it shows up as a part, the character is usually about rice or about measuring things out.',
     why: 'This is the raw crop, where 食 is the cooked meal. It is also the character Japan uses for America, in 米国.',
   },
   '糸': {
@@ -198,7 +198,7 @@ export const radicalMnemonics = {
   // Things & tools
   '刀': {
     story: 'A curved blade with a handle. Stand it on the right of a kanji and it straightens into 刂 — two strokes, still sharp.',
-    why: '刂 means cutting: 分 (divide), 前 (before), 別 (separate), 切 (cut).',
+    why: '刂 means cutting: 分 (divide), 前 (before), 別 (separate), 切 (cut). Careful: the katakana リ (ri) looks just like that 刂 form.',
   },
   '貝': {
     story: 'A cowrie shell with its two little feet sticking out of the bottom. Before there were coins, this was money.',
@@ -217,7 +217,7 @@ export const radicalMnemonics = {
     why: 'It marks anything sacred: 社 (shrine), 神 (god), 礼 (courtesy), 祝 (celebrate). Careful — 衤 (clothing) looks almost identical but has one stroke more.',
   },
   '食': {
-    story: 'A lid clapped over a bowl of rice, keeping it warm.',
+    story: 'A lidded bowl. Squeezed onto the left of a character it slims to 飠, and a meal is involved somewhere.',
     why: 'This is the cooked meal, where 米 is the raw crop. It is in 飲 (drink) and 飯 (cooked rice).',
   },
   '王': {
@@ -234,7 +234,7 @@ export const radicalMnemonics = {
   },
   '工': {
     story: 'A carpenter’s ruler — a tool with a handle at each end and a job to do.',
-    why: 'It means work and craft: 左 (left, the hand that holds the tool), 空 (sky), 江 (river).',
+    why: 'It means work and craft: 左 (left, the hand that holds the tool), 空 (sky), 江 (river). Careful: the katakana エ (e) is drawn the same.',
   },
   '言': {
     story: 'Sound coming out of a mouth in layers. The 口 at the bottom is the mouth; everything stacked above it is the noise escaping.',
@@ -256,7 +256,7 @@ export const radicalMnemonics = {
   },
   '八': {
     story: 'Two strokes pulling apart from each other. Eight, but really: splitting.',
-    why: 'As a radical it means divide far more often than it means eight. 分 (minute, divide) is this over a blade — split it, then cut it.',
+    why: 'As a radical it means divide far more often than it means eight. 分 is this over a blade — split it, then cut it. Careful: the katakana ハ (ha) is the same two strokes.',
   },
   '又': {
     story: 'A right hand grabbing at something. Again. And again.',
@@ -264,22 +264,22 @@ export const radicalMnemonics = {
   },
   '匕': {
     story: 'A ladle with a bent handle — or a person doubled over, depending on the kanji.',
-    why: 'Both readings are genuine. 花 (flower) uses it inside 化 (change): grass that has changed into a bloom. 北 (north) is two people back to back.',
+    why: 'Both readings are genuine. 花 uses it inside 化 (change): grass that has changed into a bloom. 北 is two people back to back. Careful: the katakana ヒ (hi) is near-identical.',
   },
   '卜': {
     story: 'A crack in a heated tortoise shell. Whichever way it split, that was your answer.',
-    why: 'This is where the fortune-telling characters come from. 外 (outside) is an evening plus this — reading the cracks after dark, when you should not.',
+    why: 'This is where the fortune-telling characters come from. 外 (outside) is an evening plus this. Careful: the katakana ト (to) is drawn identically.',
   },
   '厶': {
     story: 'A little shape curled in on itself, keeping its business to itself.',
-    why: 'It means private, or oneself. 私 (I, me) is grain plus this: your own share of the harvest.',
+    why: 'It means private, or oneself. 私 (I, me) is grain plus this: your own share of the harvest. Careful: the katakana ム (mu) is the same shape.',
   },
   '大': {
     story: 'A person standing with their arms stretched as wide as they will go. THIS big.',
     why: 'It is 人 (person) with the arms spread. 天 (heaven) is this with a line above it — the sky just beyond your reach.',
   },
   '小': {
-    story: 'A thing with two slivers shaved off either side, getting smaller as you watch.',
+    story: 'Two slivers shaved off a thing. As a part it is usually just muttering “and this one is small”.',
     why: 'The middle stroke is the object and the flanking ones are what has been taken away. 少 (few) is this plus one more slash.',
   },
   '入': {
@@ -287,11 +287,11 @@ export const radicalMnemonics = {
     why: 'Easy to confuse with 人 (person): in 入 the left stroke starts higher and the right one crosses over the top.',
   },
   '立': {
-    story: 'A person standing squarely on the ground, feet planted, going nowhere.',
+    story: 'Someone standing on a line. Whatever gets built on top of them starts from a standing start.',
     why: 'The bottom line is the ground — that is what makes it standing rather than merely being. 新 (new) starts with it and 音 (sound) is built on it.',
   },
   '白': {
-    story: 'The sun just breaking the horizon, when everything goes pale for a moment.',
+    story: 'First pale light on the horizon. Inside a character it often carries the sound rather than the whiteness — 百 is hyaku.',
     why: 'It is 日 (sun) with a stroke on top for the first ray. 百 (hundred) is a single 一 above this.',
   },
 }

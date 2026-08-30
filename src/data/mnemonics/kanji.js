@@ -16,11 +16,11 @@ export const kanjiMnemonics = {
   },
   '二': {
     story: 'Two fingers laid flat. The top one is shorter, which is the only thing keeping it out of trouble with 三.',
-    why: '一, 二 and 三 are plain tally marks. After three the system gives up and gets creative.',
+    why: '一, 二 and 三 are plain tally marks. After three the system gives up and gets creative. Careful: the katakana ニ (ni) is written identically — and means two as well.',
   },
   '三': {
     story: 'Three lines. This is where the tally run stops — 四 breaks the pattern completely.',
-    why: 'The middle line is the shortest. It is the last number character you can guess without being taught.',
+    why: 'The middle line is the shortest, and it is the last number you can guess without being taught. The katakana ミ (mi) is this tipped on its side — and means three too.',
   },
   '四': {
     story: 'A pair of legs (儿) shut inside a box (囗). Four walls, and someone in there counting them.',
@@ -40,7 +40,7 @@ export const kanjiMnemonics = {
   },
   '八': {
     story: 'Two strokes falling away from each other. Eight, but really: splitting.',
-    why: 'It doubles as the radical meaning divide, which is exactly the job it does inside 分 (minute).',
+    why: 'It doubles as the radical meaning divide, which is exactly the job it does inside 分 (minute). Careful: the katakana ハ (ha) is the same two strokes.',
   },
   '九': {
     story: 'A hook with a tail, curling round like a nine that ran out of ink halfway.',
@@ -56,11 +56,11 @@ export const kanjiMnemonics = {
   },
   '千': {
     story: 'Ten (十) with a stroke slashed across the top. Ten, but far, far more so.',
-    why: 'Look for the extra diagonal at the top — that is the only thing separating it from 十.',
+    why: 'Look for the extra diagonal at the top — that is the only thing separating it from 十. The katakana チ (chi) came from this character and still looks like it.',
   },
   '万': {
     story: 'A swirl that refuses to stop. Ten thousand is where the counting changes gear.',
-    why: 'Japanese groups big numbers in tens of thousands, not thousands, so 万 is a much rounder number here than it looks in English.',
+    why: 'Japanese groups big numbers in tens of thousands, not thousands, so 万 is a rounder number here than it looks in English. The katakana マ (ma) came from its top half.',
   },
   '円': {
     story: 'A coin that has been squared off. The old version was a full circle and this is what is left of it.',
@@ -322,7 +322,7 @@ export const kanjiMnemonics = {
   },
   '多': {
     story: 'One evening stacked on top of another. Rack up enough evenings and you have got a lot of them.',
-    why: '夕 evening, twice. Doubling a part is a common way of saying “many”.',
+    why: '夕 evening, twice. Doubling a part is a common way of saying “many”. The katakana タ (ta) came from the left half of this character.',
   },
   '少': {
     story: 'Small (小), with one more sliver shaved off. Now there is barely any left at all.',
@@ -340,7 +340,7 @@ export const kanjiMnemonics = {
   },
   '口': {
     story: 'A wide-open mouth, drawn as a square.',
-    why: 'It also means an opening of any kind, and it is one of the most common parts in the whole language.',
+    why: 'It also means an opening of any kind, and one of the most common parts in the whole language. Careful: the katakana ロ (ro) is the same square.',
   },
   '手': {
     story: 'A hand with the fingers fanned out and the wrist trailing down.',
