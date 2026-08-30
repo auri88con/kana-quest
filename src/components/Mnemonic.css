@@ -102,3 +102,27 @@
   letter-spacing: 0.05em;
   color: var(--color-text-faint);
 }
+
+/* Inside quiz feedback, after a wrong answer. Opens already expanded — the whole
+   point is that it appears at the moment the story is most likely to land — and
+   sits as a panel inside the quiz card rather than as a card footer. */
+.mnemonic.is-feedback {
+  margin: 0.2rem 0 0.6rem;
+  border-top: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-alt);
+  overflow: hidden;
+}
+
+.mnemonic.is-feedback .mnemonic-toggle {
+  border-radius: 0;
+  padding: 0.5rem;
+}
+
+.mnemonic.is-feedback .mnemonic-body {
+  padding: 0 0.75rem 0.75rem;
+}
+
+.mnemonic.is-feedback .mnemonic-reading {
+  background: var(--color-surface);
+}

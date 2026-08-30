@@ -12,12 +12,12 @@ import './Mnemonic.css'
  * when there is no entry yet, so a half-written script degrades to the card as
  * it was rather than to an empty box.
  */
-export default function Mnemonic({ entry, reading, tabIndex }) {
-  const [open, setOpen] = useState(false)
+export default function Mnemonic({ entry, reading, tabIndex, defaultOpen = false, variant }) {
+  const [open, setOpen] = useState(defaultOpen)
   if (!entry) return null
 
   return (
-    <div className={`mnemonic ${open ? 'is-open' : ''}`}>
+    <div className={`mnemonic ${open ? 'is-open' : ''} ${variant ? `is-${variant}` : ''}`}>
       <button
         type="button"
         className="mnemonic-toggle card-stop"
@@ -26,7 +26,7 @@ export default function Mnemonic({ entry, reading, tabIndex }) {
         onClick={() => setOpen((v) => !v)}
       >
         <span aria-hidden="true">💡</span>
-        How to remember
+        {variant === 'feedback' ? 'Here’s how to remember it' : 'How to remember'}
         <span className="mnemonic-caret" aria-hidden="true">
           ▾
         </span>

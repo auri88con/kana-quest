@@ -5,8 +5,10 @@ import { buildMultipleChoiceOptions, pickRandom } from '../utils/quiz'
 import { isRomajiMatch } from '../utils/romaji'
 import { randomCorrectMessage, randomWrongMessage } from '../utils/messages'
 import { playSound } from '../utils/sound'
+import { mnemonicFor, readingMnemonicFor } from '../data/mnemonics/index'
 import StreakStat from './StreakStat'
 import Celebration from './Celebration'
+import Mnemonic from './Mnemonic'
 import './FlashcardQuiz.css'
 
 const STREAK_MILESTONE = 5
@@ -222,6 +224,20 @@ export default function FlashcardQuiz({
           <div className={`quiz-feedback ${feedback}`}>
             <p className="quiz-feedback-headline">{feedbackMessage}</p>
             <p className="quiz-feedback-word">{noteFor(current)}</p>
+
+            {/* Only when you got it wrong. Right answers get the celebration;
+                this is the moment a story is actually worth reading, and putting
+                it here rather than back on the card is the point of the stage. */}
+            {feedback === 'wrong' && (
+              <Mnemonic
+                entry={mnemonicFor(section, current.char)}
+                // The reading hook only helps if the reading is what you missed.
+                reading={target === 'romaji' ? readingMnemonicFor(section, current.char) : undefined}
+                defaultOpen
+                variant="feedback"
+              />
+            )}
+
             <button className="btn" onClick={nextQuestion}>
               Next →
             </button>
