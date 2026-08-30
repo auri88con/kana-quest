@@ -1,0 +1,66 @@
+/* The tap target gives no affordance — it is a hidden gesture, and the About
+   card has to keep reading as plain text until you are nearly through it. */
+.settings-about-tap {
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.dev-unlock-hint {
+  margin-top: 0.5rem;
+  font-weight: 700;
+  color: var(--color-accent-text);
+}
+
+.dev-unlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 2px dotted var(--color-border-soft);
+}
+
+.dev-unlock-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-faint);
+}
+
+.dev-unlock-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dev-unlock-input {
+  flex: 1 1 6rem;
+  min-width: 0;
+  padding: 0.5rem 0.7rem;
+  border: 3px solid var(--color-border-soft);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.25em;
+  text-align: center;
+}
+
+.dev-unlock-input:focus {
+  outline: none;
+  border-color: var(--color-sakura);
+}
+
+.dev-unlock-input.is-wrong {
+  border-color: var(--color-red);
+}
+
+.settings-note.is-wrong {
+  color: var(--color-red);
+  font-weight: 600;
+}

@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useSettingsContext } from '../context/SettingsContext'
 import { useProgressContext } from '../context/ProgressContext'
 import DevPanel from '../components/DevPanel'
+import DevUnlock from '../components/DevUnlock'
+import { isDevUnlocked, setDevUnlocked } from '../utils/devAccess'
 import { THEME_OPTIONS } from '../utils/settings'
 import { playSound } from '../utils/sound'
 import './Settings.css'
@@ -61,6 +63,19 @@ export default function Settings({ onBack }) {
   const [confirmingReset, setConfirmingReset] = useState(false)
   const [resetDone, setResetDone] = useState(false)
   const noticeTimeout = useRef(null)
+  // Always on in dev; in a production build it takes the About-card gesture.
+  const [devUnlocked, setUnlocked] = useState(isDevUnlocked)
+  const showDevTools = import.meta.env.DEV || devUnlocked
+
+  function unlockDevTools() {
+    setDevUnlocked(true)
+    setUnlocked(true)
+  }
+
+  function lockDevTools() {
+    setDevUnlocked(false)
+    setUnlocked(false)
+  }
 
   useEffect(() => () => clearTimeout(noticeTimeout.current), [])
 
@@ -181,15 +196,12 @@ export default function Settings({ onBack }) {
         )}
       </section>
 
-      {/* Dropped entirely from a production build — see DevPanel.jsx. */}
-      {import.meta.env.DEV && <DevPanel />}
+      {showDevTools && <DevPanel onLock={devUnlocked ? lockDevTools : undefined} />}
 
-      <section className="settings-card card-surface settings-about">
-        <h3 className="settings-heading">About</h3>
-        <p className="settings-about-title">Kana Quest</p>
-        <p className="settings-note">by Aurora Labs 88 🌸</p>
-        <p className="settings-version">Version {APP_VERSION}</p>
-      </section>
+      {/* The About card is also the way in to the dev tools: five taps, then
+          the code. See utils/devAccess.js for why that is obscurity, not
+          security. Once unlocked in dev there is nothing left to unlock. */}
+      <DevUnlock version={APP_VERSION} onUnlock={unlockDevTools} />
     </div>
   )
 }

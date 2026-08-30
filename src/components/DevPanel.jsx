@@ -4,15 +4,15 @@ import { completedProgress, completedProgressSummary } from '../utils/devProgres
 import './DevPanel.css'
 
 /**
- * Development-only tools, rendered by Settings behind `import.meta.env.DEV`.
+ * Dev tools. Always shown in a dev build; in production it takes the hidden
+ * About-card gesture (five taps, then the code) to reach — see utils/devAccess.js.
  *
- * Deliberately not shipped. A one-tap "mark everything complete" control in the
- * real app would be one mistap away from erasing the learner's actual sense of
- * progress — which is the thing the whole app exists to build. If this ever
- * needs to be reachable on a phone against production, that is a decision to
- * take on purpose, not a default.
+ * It is deliberately hard to get to rather than absent, because "mark everything
+ * complete" is one mistap away from erasing the learner's real sense of
+ * progress, which is the thing the whole app exists to build. `onLock` is only
+ * passed when it was opened by the gesture; in dev there is nothing to lock.
  */
-export default function DevPanel() {
+export default function DevPanel({ onLock }) {
   const { progress, replaceProgress } = useProgressContext()
   const [filled, setFilled] = useState(false)
   const summary = completedProgressSummary()
@@ -37,8 +37,8 @@ export default function DevPanel() {
         <span aria-hidden="true">🛠️</span> Dev tools
       </h3>
       <p className="settings-note">
-        Only in the dev build — this whole panel is dropped from a production bundle. Filling progress overwrites
-        whatever is currently saved on this device; “Reset progress” above puts it back to empty.
+        Filling progress overwrites whatever is currently saved on this device; “Reset progress” above puts it back to
+        empty. {onLock ? 'Lock this again when you are done so it can’t be hit by accident.' : 'Always visible in the dev build.'}
       </p>
 
       <ul className="dev-panel-counts">
@@ -66,6 +66,11 @@ export default function DevPanel() {
         <button type="button" className="btn" onClick={fillEverything}>
           Mark everything 100% complete
         </button>
+        {onLock && (
+          <button type="button" className="btn btn-outline" onClick={onLock}>
+            🔒 Lock dev tools
+          </button>
+        )}
       </div>
     </section>
   )
