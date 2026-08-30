@@ -1,0 +1,40 @@
+/* Visibly not part of the app proper: a dashed border so a dev screenshot never
+   gets mistaken for the real Settings screen. */
+.dev-panel {
+  border-style: dashed;
+  border-color: var(--color-accent-text);
+}
+
+.dev-panel-counts {
+  list-style: none;
+  margin: 0.75rem 0;
+  padding: 0;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.dev-panel-counts li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-alt);
+  font-size: 0.85rem;
+}
+
+.dev-panel-counts li.is-complete {
+  background: var(--color-success-soft);
+}
+
+.dev-panel-label {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.dev-panel-value {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-accent-text);
+}

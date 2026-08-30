@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSettingsContext } from '../context/SettingsContext'
 import { useProgressContext } from '../context/ProgressContext'
+import DevPanel from '../components/DevPanel'
 import { THEME_OPTIONS } from '../utils/settings'
 import { playSound } from '../utils/sound'
 import './Settings.css'
@@ -179,6 +180,9 @@ export default function Settings({ onBack }) {
           </div>
         )}
       </section>
+
+      {/* Dropped entirely from a production build — see DevPanel.jsx. */}
+      {import.meta.env.DEV && <DevPanel />}
 
       <section className="settings-card card-surface settings-about">
         <h3 className="settings-heading">About</h3>

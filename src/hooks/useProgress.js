@@ -120,6 +120,13 @@ export function useProgress() {
     setProgress(defaultProgress())
   }, [])
 
+  // Swap the whole blob at once. Used by the dev-only "fill everything" panel
+  // today, and it is the shape cloud sync will need when a remote save has to
+  // replace the local one wholesale.
+  const replaceProgress = useCallback((next) => {
+    setProgress(next)
+  }, [])
+
   return {
     progress,
     markCharacterSeen,
@@ -127,5 +134,6 @@ export function useProgress() {
     recordReadingAnswer,
     recordConjugationAnswer,
     resetProgress,
+    replaceProgress,
   }
 }
