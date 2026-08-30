@@ -126,3 +126,18 @@
 .mnemonic.is-feedback .mnemonic-reading {
   background: var(--color-surface);
 }
+
+/* An open story needs room to be read. In a grid the cards are one column wide
+   — about 100px on a phone — which would set the prose as a six-character-wide
+   ribbon. While it is open, the card takes the whole row instead.
+   This also settles the side effect of expanding a card in a stretch grid: the
+   neighbours no longer get dragged taller, because the open card is on its own
+   row. Without :has support the card simply stays narrow — cramped, not broken. */
+.kana-card:has(.mnemonic.is-open) {
+  grid-column: 1 / -1;
+}
+
+.kana-card:has(.mnemonic.is-open) .mnemonic-body {
+  max-width: 46rem;
+  margin: 0 auto;
+}
