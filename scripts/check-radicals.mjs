@@ -9,7 +9,8 @@
 
 import { radicals, radicalGroups, radicalByAnyForm } from '../src/data/radicals.js'
 import { kanjiTier1, kanjiAllCharacters } from '../src/data/kanji.js'
-import { radicalMnemonics } from '../src/data/mnemonics.js'
+import { radicalMnemonics } from '../src/data/mnemonics/radicals.js'
+import { kanjiMnemonics, kanjiReadingMnemonics } from '../src/data/mnemonics/kanji.js'
 
 const errors = []
 const warnings = []
@@ -67,6 +68,42 @@ for (const [char, entry] of Object.entries(radicalMnemonics)) {
 }
 const missingMnemonics = radicals.filter((r) => !radicalMnemonics[r.char])
 
+// Kanji mnemonics. Beyond the key and coverage checks, this enforces the thing
+// that keeps a story honest: where kanji.js says a character is built from
+// certain radicals, the `why` line has to actually name them, in any of their
+// written forms. Otherwise a story can quietly drift away from the very
+// decomposition it claims to be explaining.
+const tier1Chars = new Set(kanjiTier1.map((k) => k.char))
+for (const [char, entry] of Object.entries(kanjiMnemonics)) {
+  const where = `kanji mnemonic ${char}`
+  if (!tier1Chars.has(char)) {
+    errors.push(`${where}: no Tier 1 kanji with this character`)
+    continue
+  }
+  if (!entry.story?.trim()) errors.push(`${where}: missing story`)
+  if (!entry.why?.trim()) errors.push(`${where}: missing why`)
+
+  const kanji = kanjiTier1.find((k) => k.char === char)
+  for (const form of kanji.components ?? []) {
+    const radical = radicalByAnyForm[form]
+    const written = [radical.char, ...radical.variants]
+    if (!written.some((f) => entry.why?.includes(f))) {
+      errors.push(
+        `${where}: why never mentions ${form} (${radical.name}), which kanji.js lists as one of its components`,
+      )
+    }
+  }
+}
+const missingKanjiMnemonics = kanjiTier1.filter((k) => !kanjiMnemonics[k.char])
+
+for (const [char, entry] of Object.entries(kanjiReadingMnemonics)) {
+  const where = `reading hook ${char}`
+  if (!tier1Chars.has(char)) errors.push(`${where}: no Tier 1 kanji with this character`)
+  else if (!entry.hook?.trim()) errors.push(`${where}: missing hook`)
+}
+const missingReadingHooks = kanjiTier1.filter((k) => !kanjiReadingMnemonics[k.char])
+const weakReadingHooks = Object.entries(kanjiReadingMnemonics).filter(([, e]) => e.weak)
+
 // Unused radicals aren't a defect — the set teaches the common radicals, not
 // only the ones Tier 1 happens to need — but it's worth seeing the number.
 const used = new Set(kanjiAllCharacters.flatMap((k) => k.components ?? []).map((f) => radicalByAnyForm[f]?.char))
@@ -83,6 +120,23 @@ console.log(
 console.log(
   `radical mnemonics: ${Object.keys(radicalMnemonics).length}/${radicals.length}` +
     (missingMnemonics.length ? ` — still to write: ${missingMnemonics.map((r) => r.char).join(' ')}` : ''),
+)
+
+console.log(
+  `kanji mnemonics:   ${Object.keys(kanjiMnemonics).length}/${kanjiTier1.length}` +
+    (missingKanjiMnemonics.length
+      ? ` — still to write: ${missingKanjiMnemonics.map((k) => k.char).join(' ')}`
+      : ''),
+)
+
+console.log(
+  `reading hooks:     ${Object.keys(kanjiReadingMnemonics).length}/${kanjiTier1.length}` +
+    (missingReadingHooks.length
+      ? ` — still to write: ${missingReadingHooks.map((k) => k.char).join(' ')}`
+      : '') +
+    // Not a defect, just a to-do list: these are the sounds English refuses to
+    // help with, kept visible so they are easy to come back and rewrite.
+    (weakReadingHooks.length ? `, ${weakReadingHooks.length} flagged weak: ${weakReadingHooks.map(([c]) => c).join(' ')}` : ''),
 )
 
 for (const w of warnings) console.warn(`warning: ${w}`)

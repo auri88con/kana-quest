@@ -2,6 +2,8 @@ import { Fragment } from 'react'
 import { useProgressContext } from '../context/ProgressContext'
 import { componentsOf } from '../utils/radicals'
 import { useCardStops } from '../hooks/useCardStops'
+import { kanjiMnemonics, kanjiReadingMnemonics } from '../data/mnemonics/index'
+import Mnemonic from './Mnemonic'
 import '../components/CharacterCard.css'
 import './KanjiCard.css'
 
@@ -79,6 +81,10 @@ export default function KanjiCard({ section, data, onOpenRadical }) {
           </div>
         </div>
       )}
+
+      {/* Last stop on the card, after the body and every chip. */}
+      <Mnemonic entry={kanjiMnemonics[data.char]}
+        reading={kanjiReadingMnemonics[data.char]} tabIndex={stopIndex(parts.length + 1)} />
     </div>
   )
 }

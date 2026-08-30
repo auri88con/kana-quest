@@ -12,7 +12,7 @@ import './Mnemonic.css'
  * when there is no entry yet, so a half-written script degrades to the card as
  * it was rather than to an empty box.
  */
-export default function Mnemonic({ entry, tabIndex }) {
+export default function Mnemonic({ entry, reading, tabIndex }) {
   const [open, setOpen] = useState(false)
   if (!entry) return null
 
@@ -36,6 +36,15 @@ export default function Mnemonic({ entry, tabIndex }) {
         <div className="mnemonic-body">
           <p className="mnemonic-story">{entry.story}</p>
           <p className="mnemonic-why">{entry.why}</p>
+          {/* The reading hook is a separate kind of claim — wordplay on the
+              sound, nothing to do with the shape — so it gets its own block
+              rather than being tacked onto the story. */}
+          {reading?.hook && (
+            <p className="mnemonic-reading">
+              <span className="mnemonic-reading-label">the reading</span>
+              {reading.hook}
+            </p>
+          )}
         </div>
       )}
     </div>

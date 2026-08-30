@@ -1,6 +1,6 @@
 import { useProgressContext } from '../context/ProgressContext'
 import { useCardStops } from '../hooks/useCardStops'
-import { radicalMnemonics } from '../data/mnemonics'
+import { radicalMnemonics } from '../data/mnemonics/index'
 import Mnemonic from './Mnemonic'
 import './CharacterCard.css'
 import './RadicalCard.css'
