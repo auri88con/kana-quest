@@ -9,6 +9,12 @@ import {
   hiraganaHandakuonMnemonics,
   hiraganaYoonMnemonics,
 } from './hiragana'
+import {
+  katakanaMnemonics,
+  katakanaVoicedMnemonics,
+  katakanaHandakuonMnemonics,
+  katakanaYoonMnemonics,
+} from './katakana'
 
 export { radicalMnemonics } from './radicals'
 export { kanjiMnemonics, kanjiReadingMnemonics } from './kanji'
@@ -24,5 +30,10 @@ export const kanaMnemonics = {
     ...hiraganaHandakuonMnemonics,
     ...hiraganaYoonMnemonics,
   },
-  katakana: {},
+  katakana: {
+    ...katakanaMnemonics,
+    ...katakanaVoicedMnemonics,
+    ...katakanaHandakuonMnemonics,
+    ...katakanaYoonMnemonics,
+  },
 }

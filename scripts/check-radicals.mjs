@@ -18,11 +18,23 @@ import {
   hiraganaYoonMnemonics,
 } from '../src/data/mnemonics/hiragana.js'
 import {
+  katakanaMnemonics,
+  katakanaVoicedMnemonics,
+  katakanaHandakuonMnemonics,
+  katakanaYoonMnemonics,
+} from '../src/data/mnemonics/katakana.js'
+import {
   hiraganaMainRows,
   hiraganaVoiced,
   hiraganaHandakuon,
   hiraganaYoon,
 } from '../src/data/hiragana.js'
+import {
+  katakanaMainRows,
+  katakanaVoiced,
+  katakanaHandakuon,
+  katakanaYoon,
+} from '../src/data/katakana.js'
 
 const errors = []
 const warnings = []
@@ -125,6 +137,10 @@ const kanaGroups = [
   ['hiragana voiced', charsOf(hiraganaVoiced), hiraganaVoicedMnemonics],
   ['hiragana handakuon', charsOf(hiraganaHandakuon), hiraganaHandakuonMnemonics],
   ['hiragana yoon', charsOf(hiraganaYoon), hiraganaYoonMnemonics],
+  ['katakana base', charsOf(katakanaMainRows), katakanaMnemonics],
+  ['katakana voiced', charsOf(katakanaVoiced), katakanaVoicedMnemonics],
+  ['katakana handakuon', charsOf(katakanaHandakuon), katakanaHandakuonMnemonics],
+  ['katakana yoon', charsOf(katakanaYoon), katakanaYoonMnemonics],
 ]
 const kanaCoverage = []
 for (const [label, expected, map] of kanaGroups) {
