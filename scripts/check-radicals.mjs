@@ -9,6 +9,7 @@
 
 import { radicals, radicalGroups, radicalByAnyForm } from '../src/data/radicals.js'
 import { kanjiTier1, kanjiAllCharacters } from '../src/data/kanji.js'
+import { radicalMnemonics } from '../src/data/mnemonics.js'
 
 const errors = []
 const warnings = []
@@ -52,6 +53,20 @@ for (const kanji of kanjiAllCharacters) {
   }
 }
 
+// Mnemonics are keyed by a radical's canonical char, so a typo or a renamed
+// radical would otherwise leave a story orphaned and a card silently blank.
+const radicalChars = new Set(radicals.map((r) => r.char))
+for (const [char, entry] of Object.entries(radicalMnemonics)) {
+  const where = `mnemonic ${char}`
+  if (!radicalChars.has(char)) {
+    errors.push(`${where}: no radical with this char (variants like 亻 must be keyed by their canonical form)`)
+    continue
+  }
+  if (!entry.story?.trim()) errors.push(`${where}: missing story`)
+  if (!entry.why?.trim()) errors.push(`${where}: missing why`)
+}
+const missingMnemonics = radicals.filter((r) => !radicalMnemonics[r.char])
+
 // Unused radicals aren't a defect — the set teaches the common radicals, not
 // only the ones Tier 1 happens to need — but it's worth seeing the number.
 const used = new Set(kanjiAllCharacters.flatMap((k) => k.components ?? []).map((f) => radicalByAnyForm[f]?.char))
@@ -63,6 +78,11 @@ console.log(`used by kanji: ${used.size}/${radicals.length}`)
 console.log(
   `tier 1 broken down: ${withComponents.length}/${kanjiTier1.length}` +
     ` (${full.length} full, ${withComponents.length - full.length} partial)`,
+)
+
+console.log(
+  `radical mnemonics: ${Object.keys(radicalMnemonics).length}/${radicals.length}` +
+    (missingMnemonics.length ? ` — still to write: ${missingMnemonics.map((r) => r.char).join(' ')}` : ''),
 )
 
 for (const w of warnings) console.warn(`warning: ${w}`)

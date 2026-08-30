@@ -107,3 +107,44 @@
   color: var(--color-text-muted);
   font-style: italic;
 }
+
+/* Every card root is a <div> now, with the card face as a button inside it, so
+   the disclosures and chips beneath can be buttons too. The root's padding moves
+   onto the body and the footers, keeping the whole card face tappable. */
+.kana-card {
+  padding: 0;
+}
+
+.kana-card-body,
+.radical-card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  /* Grid rows stretch every card to the tallest in the row; absorbing that slack
+     keeps the whole face live rather than leaving a dead strip at the bottom. */
+  flex: 1;
+  background: none;
+  border: 0;
+  padding: 0.9rem 0.6rem 0.75rem;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+
+/* .kana-card:active can't be relied on now the root is a div — iOS only applies
+   :active to elements that are interactive themselves. */
+.kana-card:has(.card-stop:active) {
+  transform: translateY(2px) scale(0.97);
+  box-shadow: var(--shadow-card-press);
+}
+
+@supports not selector(:has(*)) {
+  .kana-card-body:active,
+  .radical-card-body:active {
+    transform: translateY(2px) scale(0.97);
+  }
+}

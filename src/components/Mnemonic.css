@@ -1,0 +1,83 @@
+/* Sits at the foot of a card, below whatever the card's own footer is. Full
+   bleed like the kanji breakdown, so the cards read as one stacked layout. */
+.mnemonic {
+  width: 100%;
+  margin-top: auto;
+  border-top: 2px dotted var(--color-border-soft);
+}
+
+.mnemonic-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  width: 100%;
+  padding: 0.45rem 0.5rem;
+  background: none;
+  border: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.72rem;
+  color: var(--color-accent-text);
+  cursor: pointer;
+  border-radius: 0 0 calc(var(--radius-md) - 3px) calc(var(--radius-md) - 3px);
+  transition: background 0.15s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mnemonic-toggle:hover {
+    background: var(--color-surface-alt);
+  }
+}
+
+.mnemonic-toggle:focus-visible {
+  outline: 3px solid var(--color-sakura);
+  outline-offset: -3px;
+}
+
+.mnemonic-caret {
+  font-size: 0.65rem;
+  transition: transform 0.18s var(--ease-spring);
+}
+
+.mnemonic.is-open .mnemonic-caret {
+  transform: rotate(180deg);
+}
+
+.mnemonic-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0 0.6rem 0.7rem;
+  text-align: left;
+  animation: mnemonic-in 0.2s var(--ease-spring) both;
+}
+
+.mnemonic-story {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--color-ink);
+}
+
+/* Set apart from the story so the honest explanation never reads as part of the
+   joke — it is the bit that has to be true. */
+.mnemonic-why {
+  margin: 0;
+  padding-left: 0.5rem;
+  border-left: 2px solid var(--color-border-soft);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+}
+
+@keyframes mnemonic-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
